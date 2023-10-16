@@ -27,4 +27,4 @@ add_definitions(${PCL_DEFINITIONS})
 set(SOURCES include/glad/glad.h)
 
 add_executable(ex1 src/main.cpp)
-target_link_libraries(ex1 PRIVATE realsense2  pango_display glfw ${PCL_LIBS} ${EIGEN3_LIBS})
+target_link_libraries(ex1 PRIVATE realsense2 ${Pangolin_LIBRARIES} glfw ${PCL_LIBS} ${EIGEN3_LIBS})
