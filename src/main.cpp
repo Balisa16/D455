@@ -4,48 +4,19 @@
 #include <pangolin/scene/scenehandler.h>
 
 #include <axis.hpp>
+// #include <rs-utils.hpp>
+#include <window.hpp>
+// #include <librealsense2/rs.hpp>
+// #include <GLFW/glfw3.h>
 
 int main( int /*argc*/, char** /*argv*/ )
 {
-    pangolin::CreateWindowAndBind("D455 View",640,480);
-    glEnable(GL_DEPTH_TEST);
-
-    // Define Projection and initial ModelView matrix
-    pangolin::OpenGlRenderState s_cam = pangolin::OpenGlRenderState(
-        pangolin::ProjectionMatrix(640,480,420,420,320,240,0.2,100),
-        pangolin::ModelViewLookAt(-2,2,-2, 0,0,0, pangolin::AxisY)
-    );
-
-    pangolin::Renderable tree;
-    for(size_t i=0; i < 10; ++i ) 
-    {
-
-        std::shared_ptr<pangolin::Axis> axis_i = std::make_shared<pangolin::Axis>();
-
-        create_axis(axis_i, i*2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 90.0f);
-
-        tree.Add(axis_i);
-    }
-
-    // Create Interactive View in window
-    pangolin::SceneHandler handler(tree, s_cam);
-    pangolin::View& d_cam = pangolin::CreateDisplay()
-            .SetBounds(0.0, 1.0, 0.0, 1.0, -640.0f/480.0f)
-            .SetHandler(&handler);
-
-    d_cam.SetDrawFunction([&](pangolin::View& view){
-        view.Activate(s_cam);
-        tree.Render();
-    });
-
-    while( !pangolin::ShouldQuit() )
-    {
-        // Clear screen and activate view to render into
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // Swap frames and Process Events
-        pangolin::FinishFrame();
-    }
-
+	window app("Test");
+	glfw_state app_state;
+	// register_glfw_callbacks(app, app_state);
+	while(!app.is_open())
+	{
+		app.refresh();
+	}
     return 0;
 }
