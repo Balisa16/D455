@@ -12,7 +12,7 @@
 int main( int /*argc*/, char** /*argv*/ )
 {
 	window app("Test");
-	glfw_state app_state;
+	// glfw_state app_state;
 	// register_glfw_callbacks(app, app_state);
 	while(!app.is_open())
 	{

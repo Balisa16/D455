@@ -23,13 +23,15 @@ private:
     GLFWwindow* win;
     int _width, _height;
     app_state _state;
-    void mouse_callbacks();
+
 public:
+    // operator GLFWwindow* () { return win; }
+    // Mouse callback function
     std::function<void(bool)>           on_left_mouse = [](bool) {};
     std::function<void(double, double)> on_mouse_scroll = [](double, double) {};
     std::function<void(double, double)> on_mouse_move = [](double, double) {};
     std::function<void(int)>            on_key_release = [](int) {};
-    operator GLFWwindow* () { return win; }
+    void mouse_callbacks();
     window(std::string title, int width = 640, int height = 480);
     bool is_open();
     void refresh();
@@ -38,18 +40,18 @@ public:
 
 void window::mouse_callbacks()
 {
-    win.on_left_mouse = [&](bool pressed)
+    on_left_mouse = [&](bool pressed)
     {
         _state.ml = pressed;
     };
 
-    win.on_mouse_scroll = [&](double xoffset, double yoffset)
+    on_mouse_scroll = [&](double xoffset, double yoffset)
     {
         _state.offset_x -= static_cast<float>(xoffset);
         _state.offset_y -= static_cast<float>(yoffset);
     };
 
-    win.on_mouse_move = [&](double x, double y)
+    on_mouse_move = [&](double x, double y)
     {
         if (_state.ml)
         {
@@ -64,7 +66,7 @@ void window::mouse_callbacks()
         _state.last_y = y;
     };
 
-    win.on_key_release = [&](int key)
+    on_key_release = [&](int key)
     {
         if (key == 32) // Escape
         {
