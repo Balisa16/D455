@@ -10,16 +10,37 @@ endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(DEPENDENCIES realsense2)
 
+find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(ASSIMP REQUIRED)
+
+find_package(X11 REQUIRED)
+
 find_package(Pangolin REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/deps
     ${EIGEN3_INCLUDE_DIR}
     ${PCL_INCLUDE_DIRS}
     ${Pangolin_INCLUDE_DIRS})
+
+set(LIBS ${GLFW3_LIBRARY} 
+    X11 
+    Xrandr GL dl pthread
+    ${ASSIMP_LIBRARY}
+    ${Pangolin_LIBRARIES}
+    glfw 
+    ${PCL_LIBS} 
+    ${EIGEN3_LIBS})
+
+add_library(STB_IMAGE "src/stb_image.cpp")
+set(LIBS ${LIBS} STB_IMAGE)
+
+add_library(GLAD "src/glad.c")
+set(LIBS ${LIBS} GLAD)
 
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
@@ -27,4 +48,4 @@ add_definitions(${PCL_DEFINITIONS})
 set(SOURCES include/glad/glad.h)
 
 add_executable(ex1 src/main.cpp)
-target_link_libraries(ex1 PRIVATE realsense2 ${Pangolin_LIBRARIES} glfw ${PCL_LIBS} ${EIGEN3_LIBS})
+target_link_libraries(ex1 PRIVATE realsense2 ${LIBS})

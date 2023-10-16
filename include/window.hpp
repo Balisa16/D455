@@ -3,6 +3,7 @@
 
 #include <librealsense2/rs.hpp>
 #include <GLFW/glfw3.h>
+#include <linmath.h>
 
 struct app_state {
     app_state(float yaw = 15.0, float pitch = 15.0) : 
@@ -81,7 +82,9 @@ bool window::is_open(){
 }
 
 void window::refresh()
-{
+{   
+    /*glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
     glfwSwapBuffers(win);
     glfwPollEvents();
 }
@@ -124,6 +127,15 @@ window::window(std::string title, int width, int height) :
         });
 
     mouse_callbacks();
+
+    glViewport(0, 0, _width, _height);
+    mat4x4 projection;
+    float ratio = (float)_width / (float)_height;
+    mat4x4_perspective(projection,
+                       60.f * (float) M_PI / 180.f,
+                       ratio,
+                       1.f, 1024.f);
+    glLoadMatrixf((const GLfloat*) projection);
 }
 
 window::~window()
