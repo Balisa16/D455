@@ -3,13 +3,15 @@
 #include <pangolin/scene/axis.h>
 #include <pangolin/scene/scenehandler.h>
 
+#include <axis.hpp>
+
 int main( int /*argc*/, char** /*argv*/ )
 {
-    pangolin::CreateWindowAndBind("Main",640,480);
+    pangolin::CreateWindowAndBind("D455 View",640,480);
     glEnable(GL_DEPTH_TEST);
 
     // Define Projection and initial ModelView matrix
-    pangolin::OpenGlRenderState s_cam(
+    pangolin::OpenGlRenderState s_cam = pangolin::OpenGlRenderState(
         pangolin::ProjectionMatrix(640,480,420,420,320,240,0.2,100),
         pangolin::ModelViewLookAt(-2,2,-2, 0,0,0, pangolin::AxisY)
     );
@@ -17,8 +19,11 @@ int main( int /*argc*/, char** /*argv*/ )
     pangolin::Renderable tree;
     for(size_t i=0; i < 10; ++i ) 
     {
-        auto axis_i = std::make_shared<pangolin::Axis>();
-        axis_i->T_pc = pangolin::OpenGlMatrix::Translate(i*2.0, i*0.1, 0.0);
+
+        std::shared_ptr<pangolin::Axis> axis_i = std::make_shared<pangolin::Axis>();
+
+        create_axis(axis_i, i*2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 90.0f);
+
         tree.Add(axis_i);
     }
 
