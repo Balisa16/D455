@@ -19,7 +19,7 @@ or use
 ```
 sudo apt-get install libpango-1.0-0
 ```
-</br>
+<br />
 Please recheck your pangolin installation with
 ```
 echo $LD_LIBRARY_PATH
