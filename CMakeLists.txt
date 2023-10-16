@@ -11,7 +11,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(DEPENDENCIES realsense2)
 
 find_package(glfw3 REQUIRED)
-find_package(Pangolin 0.8 REQUIRED)
+find_package(Pango REQUIRED)
 find_package(PCL REQUIRED)
 
 include_directories(
