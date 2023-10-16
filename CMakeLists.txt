@@ -22,30 +22,29 @@ find_package(PCL REQUIRED)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/deps
     ${EIGEN3_INCLUDE_DIR}
     ${PCL_INCLUDE_DIRS}
     ${Pangolin_INCLUDE_DIRS})
 
-set(LIBS ${GLFW3_LIBRARY} 
+set(MYLIBS 
+    ${GLFW3_LIBRARY} 
+    glfw
     X11 
     Xrandr GL dl pthread
     ${ASSIMP_LIBRARY}
     ${Pangolin_LIBRARIES}
-    glfw 
     ${PCL_LIBS} 
     ${EIGEN3_LIBS})
 
-add_library(STB_IMAGE "src/stb_image.cpp")
-set(LIBS ${LIBS} STB_IMAGE)
-
-add_library(GLAD "src/glad.c")
-set(LIBS ${LIBS} GLAD)
+add_library(ADDED_LIBS
+    src/window.cc
+    src/glad.c
+    src/stb_image.cc)
 
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-set(SOURCES include/glad/glad.h)
-
 add_executable(ex1 src/main.cpp)
-target_link_libraries(ex1 PRIVATE realsense2 ${LIBS})
+target_link_libraries(ex1 PRIVATE realsense2 ADDED_LIBS ${MYLIBS} ${GLFW3_LIBRARY})
