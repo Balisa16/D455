@@ -3,25 +3,22 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
+// #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glad/glad.h>
 
-char* file2buf(std::string file)
+class Shader
 {
-    FILE *fptr;
-    long length;
-    char *buf;
-
-    fptr = fopen(file.c_str(), "rb"); /* Open file for reading */
-    if (!fptr) /* Return NULL on failure */
-        return NULL;
-    fseek(fptr, 0, SEEK_END); /* Seek to the end of the file */
-    length = ftell(fptr); /* Find out how many bytes into the file we are */
-    buf = (char*)malloc(length+1); /* Allocate a buffer for the entire length of the file and a null terminator */
-    fseek(fptr, 0, SEEK_SET); /* Go back to the beginning of the file */
-    fread(buf, length, 1, fptr); /* Read the contents of the file in to the buffer */
-    fclose(fptr); /* Close the file */
-    buf[length] = 0; /* Null terminator */
-
-    return buf; /* Return the buffer */
-}
+private:
+    unsigned int ID;
+    char* load_file(const char *filename);
+    void check_compile(std::string type, bool program = false);
+public:
+    Shader();
+    void init(std::string vert_file, std::string frag_file);
+    void use();
+    ~Shader();
+};
 
 #endif

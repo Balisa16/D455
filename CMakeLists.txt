@@ -41,6 +41,7 @@ set(MYLIBS
 
 add_library(ADDED_LIBS
     src/window.cc
+    src/shader.cc
     src/glad.c
     src/stb_image.cc)
 
