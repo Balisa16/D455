@@ -24,6 +24,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/deps
+    ${CMAKE_SOURCE_DIR}/include/glm
     ${EIGEN3_INCLUDE_DIR}
     ${PCL_INCLUDE_DIRS}
     ${Pangolin_INCLUDE_DIRS})
