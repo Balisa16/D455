@@ -12,13 +12,13 @@ set(DEPENDENCIES realsense2)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
-find_package(ASSIMP REQUIRED)
+# find_package(ASSIMP REQUIRED)
 
 find_package(X11 REQUIRED)
 
-find_package(Pangolin REQUIRED)
+# find_package(Pangolin REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(PCL REQUIRED)
+# find_package(PCL REQUIRED)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -26,17 +26,18 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/deps
     ${CMAKE_SOURCE_DIR}/include/glm
     ${EIGEN3_INCLUDE_DIR}
-    ${PCL_INCLUDE_DIRS}
-    ${Pangolin_INCLUDE_DIRS})
+    # ${PCL_INCLUDE_DIRS}
+    # ${Pangolin_INCLUDE_DIRS}
+    )
 
 set(MYLIBS 
     ${GLFW3_LIBRARY} 
     glfw
     X11 
     Xrandr GL dl pthread
-    ${ASSIMP_LIBRARY}
-    ${Pangolin_LIBRARIES}
-    ${PCL_LIBS} 
+    # ${ASSIMP_LIBRARY}
+    # ${Pangolin_LIBRARIES}
+    # ${PCL_LIBS} 
     ${EIGEN3_LIBS})
 
 add_library(ADDED_LIBS
