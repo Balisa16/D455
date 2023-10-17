@@ -2,6 +2,10 @@
 Sampling code for D455 Camera
 
 ## Dependencies
+### GLFW3
+```
+sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev
+```
 ### GLEW
 ```
 sudo apt-get install -y libglew-dev
