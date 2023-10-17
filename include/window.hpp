@@ -5,8 +5,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-extern const char *vertexShaderSource;
-extern const char *fragmentShaderSource;
+// extern const char *vertexShaderSource;
+// extern const char *fragmentShaderSource;
 
 class window
 {
@@ -16,11 +16,11 @@ private:
     int width, height;
     unsigned int shader_program, VAO, VBO;
 
-    unsigned int compile_shader();
-    void conf_vertex(unsigned int* VAO, unsigned int* VBO);
     static void fbuff_callback(GLFWwindow* window, int width, int height);
 public:
     window(std::string title = "D455", int width = 640, int height = 480);
+    void init_shader(const char * vert_source, const char * frag_source);
+    void conf_vertex();
     bool is_open();
     void processinput();
     void clear_buffer();

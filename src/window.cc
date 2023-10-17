@@ -1,5 +1,6 @@
 #include <window.hpp>
 
+/*
 const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "void main()\n"
@@ -12,6 +13,7 @@ const char *fragmentShaderSource = "#version 330 core\n"
     "{\n"
     "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}\n\0";
+*/
 
 window::window(std::string title, int width, int height):
     title(title), width(width), height(height)
@@ -38,9 +40,6 @@ window::window(std::string title, int width, int height):
         std::cerr << "Failed to initialize GLAD" << std::endl;
         throw;
     }
-    
-    shader_program = compile_shader();
-    conf_vertex(&VAO, &VBO);
 }
 
 bool window::is_open()
@@ -73,11 +72,11 @@ void window::swap_poll()
     glfwPollEvents();
 }
 
-unsigned int window::compile_shader()
+void window::init_shader(const char * vert_source, const char * frag_source)
 {
     // Vertex Shader
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glShaderSource(vertexShader, 1, &vert_source, NULL);
     glCompileShader(vertexShader);
     // check for shader compile errors
     int success;
@@ -91,7 +90,7 @@ unsigned int window::compile_shader()
 
     // Fragment Shader
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glShaderSource(fragmentShader, 1, &frag_source, NULL);
     glCompileShader(fragmentShader);
     // check for shader compile errors
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
@@ -102,23 +101,21 @@ unsigned int window::compile_shader()
     }
 
     // Link shaders
-    unsigned int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
+    shader_program = glCreateProgram();
+    glAttachShader(shader_program, vertexShader);
+    glAttachShader(shader_program, fragmentShader);
+    glLinkProgram(shader_program);
     // check for linking errors
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
     if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        glGetProgramInfoLog(shader_program, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
-
-    return shaderProgram;
 }
 
-void window::conf_vertex(unsigned int* VAO, unsigned int* VBO)
+void window::conf_vertex()
 {
     float vertices[] = {
         -0.5f, -0.5f, 0.0f, // left  
@@ -126,12 +123,12 @@ void window::conf_vertex(unsigned int* VAO, unsigned int* VBO)
          0.0f,  0.5f, 0.0f  // top   
     }; 
 
-    glGenVertexArrays(1, VAO);
-    glGenBuffers(1, VBO);
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(*VAO);
+    glBindVertexArray(VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);

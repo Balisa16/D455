@@ -46,5 +46,5 @@ add_library(ADDED_LIBS
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-add_executable(ex1 src/main.cpp)
+add_executable(ex1 test/main.cpp)
 target_link_libraries(ex1 PRIVATE realsense2 ADDED_LIBS ${MYLIBS} ${GLFW3_LIBRARY})
