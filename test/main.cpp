@@ -1,29 +1,29 @@
-/*#include <iostream>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-*/
-
 #include <window.hpp>
+#include <shader.hpp>
+#include <glm/glm.hpp>
 
 int main()
 {
-	/*
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Monitor", NULL, NULL);
-	if (window == NULL)
-		return -1;
-	glfwMakeContextCurrent(window);
-	
-	while (!glfwWindowShouldClose(window))
-	{
-		glfwPollEvents();
-	}
-
-	glfwTerminate();*/
-	return 0;
+    window win("Test");
+    Shader shader;
+    shader.init("../../resources/shader/main.vert", "../../resources/shader/main.frag");
+    shader.use();
+    win.conf_vertex();
+    shader.use();
+    shader.setI("texture1", 0);
+    shader.setI("texture2", 1);
+    while (win.is_open())
+    {
+        win.processinput();
+        win.clear_buffer();
+        win.bind_texture();
+        glm::mat4 projection = glm::perspective(glm::radians(win.get_fov()), win.get_width() / win.get_height(), 0.1f, 100.0f);
+        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        shader.use();
+        shader.setM4("projection", projection);
+        shader.setM4("view", view);
+        win.draw(std::make_shared<Shader>(shader));
+        win.swap_poll();
+    }
+    return 0;
 }

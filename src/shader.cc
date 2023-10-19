@@ -1,31 +1,32 @@
 #include <shader.hpp>
 
-char* Shader::load_file(const char *filename)
+std::string Shader::load_file(const char *filename)
 {
-	FILE *fptr;
-    long length;
-    char *buf;
-
-    fptr = fopen(filename, "rb");
-    if (!fptr)
-        return NULL;
-    fseek(fptr, 0, SEEK_END);
-    length = ftell(fptr);
-    buf = (char*)malloc(length+1);
-    fseek(fptr, 0, SEEK_SET);
-    fread(buf, length, 1, fptr);
-    fclose(fptr);
-    buf[length] = 0;
-
-    return buf;
+    std::ifstream file_streamer;
+    std::string data;
+    file_streamer.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    try
+    {
+        file_streamer.open(filename);
+        std::stringstream shader_stream;
+        shader_stream << file_streamer.rdbuf();
+        file_streamer.close();
+        data = shader_stream.str();
+    }
+    catch (std::ifstream::failure& e)
+    {
+        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
+        throw;
+    }
+    return data;
 }
 
 Shader::Shader(){}
 
 void Shader::init(std::string vert_file, std::string frag_file)
 {
-	const char *vert_source = load_file(vert_file.c_str());
-	const char *frag_source = load_file(frag_file.c_str());
+	const char *vert_source = load_file(vert_file.c_str()).c_str();
+	const char *frag_source = load_file(frag_file.c_str()).c_str();
 
 	// Vertex Shader
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);

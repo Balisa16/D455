@@ -4,15 +4,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <string>
+#include <fstream>
+#include <sstream>
 // #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glad/glad.h>
+
+#define _CRT_SECURE_NO_WARNINGS
 
 class Shader
 {
 private:
     unsigned int ID;
-    char* load_file(const char *filename);
+    std::string load_file(const char *filename);
     void check_compile(std::string type, bool program = false);
 public:
     Shader();

@@ -1,5 +1,5 @@
-*.vcxproj
-*.filters
-*.user
+# *.vcxproj
+# *.filters
+# *.user
 x64
 .vs
