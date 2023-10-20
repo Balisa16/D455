@@ -66,6 +66,16 @@ void Shader::check_compile(std::string type, bool program)
 		std::cout << "Error Compile " << type << '\n';
 }
 
+void Shader::setI(const std::string name, int value)
+{
+    glUniform1i(glGetUniformLocation(ID, name.c_str()), value); 
+}
+
+void Shader::setM4(const std::string name, const glm::mat4 &mat) const
+{
+    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+
 Shader::~Shader()
 {
 	glDeleteProgram(ID);

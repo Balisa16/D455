@@ -18,6 +18,8 @@ public:
     Shader();
     void init(std::string vert_file, std::string frag_file);
     void use();
+    void setI(const std::string name, int value);
+    void setM4(const std::string name, const glm::mat4 &mat) const;
     ~Shader();
 };
 
