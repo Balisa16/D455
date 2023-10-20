@@ -19,8 +19,8 @@ include_directories(
     thirdparty/glfw/src
     thirdparty/glm/glm
     thirdparty/librealsense/include
-    include
-    src)
+    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/src)
 
 add_library(ADDED_LIBS STATIC
     src/window.cc
@@ -28,20 +28,21 @@ add_library(ADDED_LIBS STATIC
     src/glad.c
     src/stb_image.cc)
 
-set(SOURCES
-    test/testlib.cpp
-)
+target_link_libraries(ADDED_LIBS PRIVATE glfw)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
+file(GLOB SRC_FILES test/*.cpp)
+foreach(SRC_FILE ${SRC_FILES})
+    get_filename_component(TARGET_NAME ${SRC_FILE} NAME_WE)
 
-add_executable(testlib ${SOURCES})
-target_link_libraries(testlib PRIVATE glfw glm realsense2)
-target_include_directories(testlib PRIVATE thirdparty/glfw/include)
+    message("Build ${TARGET_NAME} in ${SRC_FILE}")
 
-
-add_executable(main test/main.cpp)
-target_link_libraries(main PRIVATE glfw glm realsense2 ADDED_LIBS)
-target_include_directories(main PRIVATE
-    thirdparty/glfw/include
-    thirdparty/glfw/src
-)
+    add_executable(${TARGET_NAME} ${SRC_FILE})
+    target_link_libraries(${TARGET_NAME} PRIVATE 
+        glfw 
+        glm 
+        ADDED_LIBS
+        realsense2)
+    target_include_directories(${TARGET_NAME} PRIVATE
+        thirdparty/glfw/include
+    )
+endforeach()
