@@ -23,6 +23,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/src)
 
 add_library(ADDED_LIBS STATIC
+    src/callback.cc
     src/window.cc
     src/shader.cc
     src/glad.c

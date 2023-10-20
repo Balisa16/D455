@@ -13,24 +13,10 @@
 #include <iomanip>
 #include <memory>
 #include <shader.hpp>
+#include <callback.hpp>
 
 // extern const char *vertexShaderSource;
 // extern const char *fragmentShaderSource;
-
-// camera
-extern glm::vec3 cameraPos;
-extern glm::vec3 cameraFront;
-extern glm::vec3 cameraUp;
-
-extern bool first_mouse;
-extern float yaw;
-extern float pitch;
-extern float lastX;
-extern float lastY;
-extern float fov;
-
-extern bool left_pressed;
-extern bool right_pressed;
 
 class window
 {
@@ -97,11 +83,6 @@ private:
         glm::vec3( 1.5f,  0.2f, -1.5f),
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
-
-    static void fbuff_callback(GLFWwindow* window, int width, int height);
-    static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-    static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-    static void mouse_btn_callback(GLFWwindow* window, int button, int action, int mods);
 public:
     window(std::string title = "D455", int width = 640, int height = 480);
     void conf_vertex();
