@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <iostream>
 // #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
+#include <glm.hpp>
 #include <glad/glad.h>
 
 class Shader

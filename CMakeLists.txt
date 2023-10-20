@@ -14,46 +14,34 @@ add_subdirectory(thirdparty/librealsense)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(DEPENDENCIES realsense2)
 
+include_directories(
+    thirdparty/glfw/include
+    thirdparty/glfw/src
+    thirdparty/glm/glm
+    thirdparty/librealsense/include
+    include
+    src)
+
+add_library(ADDED_LIBS STATIC
+    src/window.cc
+    src/shader.cc
+    src/glad.c
+    src/stb_image.cc)
+
 set(SOURCES
     test/testlib.cpp
 )
 
-add_executable(test1 ${SOURCES})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/test)
 
-target_link_libraries(test1 PRIVATE glfw glm realsense2)
+add_executable(testlib ${SOURCES})
+target_link_libraries(testlib PRIVATE glfw glm realsense2)
+target_include_directories(testlib PRIVATE thirdparty/glfw/include)
 
-target_include_directories(test1 PRIVATE thirdparty/glfw/include)
 
-
-# find_package(OpenGL REQUIRED)
-# find_package(X11 REQUIRED)
-# find_package(Eigen3 REQUIRED)
-
-# include_directories(
-#     ${CMAKE_CURRENT_SOURCE_DIR}/include
-#     ${CMAKE_CURRENT_SOURCE_DIR}/src
-#     ${CMAKE_CURRENT_SOURCE_DIR}/deps
-#     ${CMAKE_SOURCE_DIR}/include/glm
-#     )
-
-# set(MYLIBS 
-#     ${GLFW3_LIBRARY} 
-#     glfw
-#     X11 
-#     Xrandr GL dl pthread
-#     # ${ASSIMP_LIBRARY}
-#     # ${Pangolin_LIBRARIES}
-#     # ${PCL_LIBS} 
-#     ${EIGEN3_LIBS})
-
-# add_library(ADDED_LIBS
-#     src/window.cc
-#     src/shader.cc
-#     src/glad.c
-#     src/stb_image.cc)
-
-# link_directories(${PCL_LIBRARY_DIRS})
-# add_definitions(${PCL_DEFINITIONS})
-
-# add_executable(ex1 test/main.cpp)
-# target_link_libraries(ex1 PRIVATE realsense2 ADDED_LIBS ${MYLIBS} ${GLFW3_LIBRARY})
+add_executable(main test/main.cpp)
+target_link_libraries(main PRIVATE glfw glm realsense2 ADDED_LIBS)
+target_include_directories(main PRIVATE
+    thirdparty/glfw/include
+    thirdparty/glfw/src
+)
