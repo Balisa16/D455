@@ -7,47 +7,52 @@ if(NOT CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
+add_subdirectory(thirdparty/glfw)
+add_subdirectory(thirdparty/glm)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(DEPENDENCIES realsense2)
 
-find_package(OpenGL REQUIRED)
-find_package(glfw3 REQUIRED)
-# find_package(ASSIMP REQUIRED)
+set(SOURCES
+    test/testlib.cpp
+)
 
-find_package(X11 REQUIRED)
+add_executable(test1 ${SOURCES})
 
-# find_package(Pangolin REQUIRED)
-find_package(Eigen3 REQUIRED)
-# find_package(PCL REQUIRED)
+target_link_libraries(test1 PRIVATE glfw glm)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/deps
-    ${CMAKE_SOURCE_DIR}/include/glm
-    ${EIGEN3_INCLUDE_DIR}
-    # ${PCL_INCLUDE_DIRS}
-    # ${Pangolin_INCLUDE_DIRS}
-    )
+target_include_directories(test1 PRIVATE thirdparty/glfw/include)
 
-set(MYLIBS 
-    ${GLFW3_LIBRARY} 
-    glfw
-    X11 
-    Xrandr GL dl pthread
-    # ${ASSIMP_LIBRARY}
-    # ${Pangolin_LIBRARIES}
-    # ${PCL_LIBS} 
-    ${EIGEN3_LIBS})
 
-add_library(ADDED_LIBS
-    src/window.cc
-    src/shader.cc
-    src/glad.c
-    src/stb_image.cc)
+# find_package(OpenGL REQUIRED)
+# find_package(X11 REQUIRED)
+# find_package(Eigen3 REQUIRED)
 
-link_directories(${PCL_LIBRARY_DIRS})
-add_definitions(${PCL_DEFINITIONS})
+# include_directories(
+#     ${CMAKE_CURRENT_SOURCE_DIR}/include
+#     ${CMAKE_CURRENT_SOURCE_DIR}/src
+#     ${CMAKE_CURRENT_SOURCE_DIR}/deps
+#     ${CMAKE_SOURCE_DIR}/include/glm
+#     )
 
-add_executable(ex1 test/main.cpp)
-target_link_libraries(ex1 PRIVATE realsense2 ADDED_LIBS ${MYLIBS} ${GLFW3_LIBRARY})
+# set(MYLIBS 
+#     ${GLFW3_LIBRARY} 
+#     glfw
+#     X11 
+#     Xrandr GL dl pthread
+#     # ${ASSIMP_LIBRARY}
+#     # ${Pangolin_LIBRARIES}
+#     # ${PCL_LIBS} 
+#     ${EIGEN3_LIBS})
+
+# add_library(ADDED_LIBS
+#     src/window.cc
+#     src/shader.cc
+#     src/glad.c
+#     src/stb_image.cc)
+
+# link_directories(${PCL_LIBRARY_DIRS})
+# add_definitions(${PCL_DEFINITIONS})
+
+# add_executable(ex1 test/main.cpp)
+# target_link_libraries(ex1 PRIVATE realsense2 ADDED_LIBS ${MYLIBS} ${GLFW3_LIBRARY})
