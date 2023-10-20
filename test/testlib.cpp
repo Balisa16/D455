@@ -1,9 +1,12 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <librealsense2/rs.hpp>
 
 int main()
 {
+    rs2::pointcloud pc;
+    
     glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
     
 	glfwInit();
