@@ -31,10 +31,11 @@ add_library(ADDED_LIBS STATIC
 target_link_libraries(ADDED_LIBS PRIVATE glfw)
 
 file(GLOB SRC_FILES test/*.cpp)
+message("\nDetect target")
 foreach(SRC_FILE ${SRC_FILES})
     get_filename_component(TARGET_NAME ${SRC_FILE} NAME_WE)
 
-    message("Build ${TARGET_NAME} in ${SRC_FILE}")
+    message("\tFound : ${TARGET_NAME}")
 
     add_executable(${TARGET_NAME} ${SRC_FILE})
     target_link_libraries(${TARGET_NAME} PRIVATE 
@@ -46,3 +47,4 @@ foreach(SRC_FILE ${SRC_FILES})
         thirdparty/glfw/include
     )
 endforeach()
+message("")
