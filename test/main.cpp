@@ -18,7 +18,7 @@ int main()
         win.clear_buffer();
         win.bind_texture();
         glm::mat4 projection = glm::perspective(glm::radians(win.get_fov()), win.get_width() / win.get_height() , 0.1f, 100.0f);
-        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        glm::mat4 view = glm::lookAt(CAMERA_POS, CAMERA_POS + CAMERA_FRONT, CAMERA_UP);
         shader.use();
         shader.setM4("projection", projection);
         shader.setM4("view", view);

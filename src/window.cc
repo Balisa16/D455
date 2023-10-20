@@ -163,7 +163,7 @@ void window::conf_vertex()
     stbi_image_free(data);
 }
 
-float window::get_fov(){ return fov;}
+float window::get_fov(){ return FOV;}
 
 float window::get_width(){ return width;}
 

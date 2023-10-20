@@ -7,16 +7,16 @@
 #include <iostream>
 
 // camera
-extern glm::vec3 cameraPos;
-extern glm::vec3 cameraFront;
-extern glm::vec3 cameraUp;
+extern glm::vec3 CAMERA_POS;
+extern glm::vec3 CAMERA_FRONT;
+extern glm::vec3 CAMERA_UP;
 
 extern bool first_mouse;
 extern float yaw;
 extern float pitch;
-extern float lastX;
-extern float lastY;
-extern float fov;
+extern float LAST_X;
+extern float LAST_Y;
+extern float FOV;
 
 extern bool left_pressed;
 extern bool right_pressed;
