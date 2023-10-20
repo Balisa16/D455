@@ -1,18 +1,18 @@
 #include <callback.hpp>
 
 // camera
-glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 CAMERA_POS   = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 CAMERA_FRONT = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 CAMERA_UP    = glm::vec3(0.0f, 1.0f, 0.0f);
 
 bool first_mouse = true;
 bool left_pressed = false;
 bool right_pressed = false;
-float yaw   = -90.0f;
-float pitch =  0.0f;
-float lastX =  800.0f / 2.0f;
-float lastY =  600.0f / 2.0f;
-float fov   =  45.0f;
+float YAW   = -90.0f;
+float PITCH =  0.0f;
+float LAST_X =  800.0f / 2.0f;
+float LAST_Y =  600.0f / 2.0f;
+float FOV   =  45.0f;
 
 void fbuff_callback(GLFWwindow* window, int width, int height)
 {
@@ -30,44 +30,44 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 
         if (first_mouse)
         {
-            lastX = xpos;
-            lastY = ypos;
+            LAST_X = xpos;
+            LAST_Y = ypos;
             first_mouse = false;
         }
 
-        float xoffset = xpos - lastX;
-        float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-        lastX = xpos;
-        lastY = ypos;
+        float xoffset = xpos - LAST_X;
+        float yoffset = LAST_Y - ypos; // reversed since y-coordinates go from bottom to top
+        LAST_X = xpos;
+        LAST_Y = ypos;
 
         float sensitivity = 0.1f; // change this value to your liking
         xoffset *= sensitivity;
         yoffset *= sensitivity;
 
-        yaw += xoffset;
-        pitch += yoffset;
+        YAW += xoffset;
+        PITCH += yoffset;
 
-        // make sure that when pitch is out of bounds, screen doesn't get flipped
-        if (pitch > 89.0f)
-            pitch = 89.0f;
-        if (pitch < -89.0f)
-            pitch = -89.0f;
+        // make sure that when PITCH is out of bounds, screen doesn't get flipped
+        if (PITCH > 89.0f)
+            PITCH = 89.0f;
+        if (PITCH < -89.0f)
+            PITCH = -89.0f;
 
         glm::vec3 front;
-        front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-        front.y = sin(glm::radians(pitch));
-        front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-        cameraFront = glm::normalize(front);
+        front.x = cos(glm::radians(YAW)) * cos(glm::radians(PITCH));
+        front.y = sin(glm::radians(PITCH));
+        front.z = sin(glm::radians(YAW)) * cos(glm::radians(PITCH));
+        CAMERA_FRONT = glm::normalize(front);
     }
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    fov -= (float)yoffset;
-    if (fov < 1.0f)
-        fov = 1.0f;
-    if (fov > 45.0f)
-        fov = 45.0f;
+    FOV -= (float)yoffset;
+    if (FOV < 1.0f)
+        FOV = 1.0f;
+    if (FOV > 45.0f)
+        FOV = 45.0f;
 }
 
 void mouse_btn_callback(GLFWwindow* window, int button, int action, int mods)
