@@ -7,3 +7,6 @@
 [submodule "thirdpary/librealsense"]
 	path = thirdpary/librealsense
 	url = https://github.com/IntelRealSense/librealsense.git
+[submodule "thirdparty/librealsense"]
+	path = thirdparty/librealsense
+	url = https://github.com/IntelRealSense/librealsense.git
