@@ -20,7 +20,8 @@ char* Shader::load_file(const char *filename)
     return buf;
 }
 
-Shader::Shader(){}
+Shader::Shader()
+{}
 
 void Shader::init(std::string vert_file, std::string frag_file)
 {
@@ -63,7 +64,7 @@ void Shader::check_compile(std::string type, bool program)
 		glGetShaderiv(ID, GL_COMPILE_STATUS, &success);
 
 	if(!success)
-		std::cout << "Error Compile " << type << '\n';
+		std::cout << "Error Compile " << type << " [" << success << "]\n";
 }
 
 void Shader::setI(const std::string name, int value)
