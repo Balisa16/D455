@@ -34,7 +34,7 @@ window::window(std::string title, int width, int height):
 
     glfwMakeContextCurrent(win);
 
-    glViewport(0, 0, width, height);
+    LPos_press = std::make_pair<float, float>(width, height);
     glfwSetFramebufferSizeCallback(win, fbuff_callback);
     glfwSetCursorPosCallback(win, mouse_callback);
     glfwSetScrollCallback(win, scroll_callback);
@@ -47,6 +47,7 @@ window::window(std::string title, int width, int height):
     }
 
     glEnable(GL_DEPTH_TEST);
+    glViewport(0, 0, width, height);
 }
 
 bool window::is_open()

@@ -10,9 +10,9 @@ bool left_pressed = false;
 bool right_pressed = false;
 float YAW   = -90.0f;
 float PITCH =  0.0f;
-float LAST_X =  800.0f / 2.0f;
-float LAST_Y =  600.0f / 2.0f;
 float FOV   =  45.0f;
+
+MousePos LPos_press;
 
 void fbuff_callback(GLFWwindow* window, int width, int height)
 {
@@ -21,31 +21,29 @@ void fbuff_callback(GLFWwindow* window, int width, int height)
 
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
-    if(left_pressed)
+    if(LPos_press.pressed)
     {
         float xpos = static_cast<float>(xposIn);
         float ypos = static_cast<float>(yposIn);
-
-        std::cout << std::fixed << std::setprecision(2) << "x: " << xpos << ",\ty: " << ypos << '\n';
-
-        if (first_mouse)
+        if(LPos_press.changed)
         {
-            LAST_X = xpos;
-            LAST_Y = ypos;
-            first_mouse = false;
+            LPos_press.x = xpos;
+            LPos_press.y = ypos;
+            LPos_press.changed = false;
         }
 
-        float xoffset = xpos - LAST_X;
-        float yoffset = LAST_Y - ypos; // reversed since y-coordinates go from bottom to top
-        LAST_X = xpos;
-        LAST_Y = ypos;
+        float xoffset = xpos - LPos_press.x;
+        float yoffset = LPos_press.y - ypos; // reversed since y-coordinates go from bottom to top
 
-        float sensitivity = 0.1f; // change this value to your liking
+        LPos_press.x = xpos;
+        LPos_press.y = ypos;
+
+        float sensitivity = 0.1f;
         xoffset *= sensitivity;
         yoffset *= sensitivity;
 
-        YAW += xoffset;
-        PITCH += yoffset;
+        YAW -= xoffset;
+        PITCH -= yoffset;
 
         // make sure that when PITCH is out of bounds, screen doesn't get flipped
         if (PITCH > 89.0f)
@@ -82,8 +80,11 @@ void mouse_btn_callback(GLFWwindow* window, int button, int action, int mods)
     else if(button == GLFW_MOUSE_BUTTON_LEFT)
     {
         if(action == GLFW_PRESS)
-            left_pressed = true;
+        {
+            LPos_press.pressed = true;
+            LPos_press.changed = true;
+        }
         else if(action == GLFW_RELEASE)
-            left_pressed = false;
+            LPos_press.pressed = false;
     }
 }

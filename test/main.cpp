@@ -2,10 +2,11 @@
 #include <shader.hpp>
 #include <glm/glm.hpp>
 
-int main()
+int main(int argc, char **argv)
 {
-    window win("Test");
+    window win;
     Shader shader;
+    std::cout.flush();
     shader.init("../test/main.vert", "../test/main.frag");
     shader.use();
     win.conf_vertex();

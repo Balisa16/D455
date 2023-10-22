@@ -31,6 +31,8 @@ add_library(ADDED_LIBS STATIC
 
 target_link_libraries(ADDED_LIBS PRIVATE glfw)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/release)
+
 file(GLOB SRC_FILES test/*.cpp)
 message("\nDetect target")
 foreach(SRC_FILE ${SRC_FILES})
