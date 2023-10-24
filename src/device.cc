@@ -3,6 +3,9 @@
 
 Device::Device()
 {
+    // Check folder for pointcloud
+    check_dir();
+
 	cfg.enable_stream(RS2_STREAM_COLOR);
     cfg.enable_stream(RS2_STREAM_INFRARED);
     cfg.enable_stream(RS2_STREAM_DEPTH);
@@ -52,6 +55,30 @@ void Device::check_dir(std::string folder)
         {
             std::cout << "Failed create pointcloud folder\n";
             throw;
+        }
+    }
+
+    bool is_empty = true;
+    for (fs::directory_iterator it(folder); it != fs::directory_iterator(); ++it)
+    {
+        is_empty =  false;
+        break;
+    }
+
+    if(!is_empty)
+    {
+        std::cout << "Pointcloud folder isn't empty. Do you want to delete all file on pointcloud folder ? [y/n] ";
+        std::cout.flush();
+        char in_char;
+        std::cin >> in_char;
+        if(in_char == 'y' || in_char == 'Y')
+        {
+            std::cout << "\033[32mDelete all\033[0m file in pointcloud folder\n";
+            for (fs::directory_iterator it(folder); it != fs::directory_iterator(); ++it) {
+                if (fs::is_regular_file(it->status())) {
+                    fs::remove(it->path());
+                }
+            }
         }
     }
 }
