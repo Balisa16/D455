@@ -44,7 +44,7 @@ void Device::get_pc(rs2::points& points, rs2::video_frame& color, int loop)
         for(int j = 0; j < loop; j += _div)
             std::cout << "█";
         std::cout << "] " << (int)(i*100/loop) << "%     \r";
-        std::cout.flush()
+        std::cout.flush();
     }
     std::cout << '\n';
     color = frames.get_color_frame();
