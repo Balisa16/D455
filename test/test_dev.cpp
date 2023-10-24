@@ -26,8 +26,6 @@ int main()
 		std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(t_now-t_past);
 		t_past = t_now;
 		float _fps = 1000000 / duration.count();
-		std::cout << "FPS : " << _fps << "   \r";
-		std::cout.flush();
 
 
 		/*for (int i = 0; i < pc.size(); ++i)
@@ -45,6 +43,5 @@ int main()
 		break;
 		counter--;
 	}
-	std::cout << '\n';
 	return 0;
 }
