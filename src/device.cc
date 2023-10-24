@@ -59,7 +59,7 @@ void Device::check_dir(std::string folder)
     }
 
     bool is_empty = true;
-    for (fs::directory_iterator it(folder); it != fs::directory_iterator(); ++it)
+    for (boost::filesystem::directory_iterator it(folder); it != boost::filesystem::directory_iterator(); ++it)
     {
         is_empty =  false;
         break;
@@ -74,9 +74,9 @@ void Device::check_dir(std::string folder)
         if(in_char == 'y' || in_char == 'Y')
         {
             std::cout << "\033[32mDelete all\033[0m file in pointcloud folder\n";
-            for (fs::directory_iterator it(folder); it != fs::directory_iterator(); ++it) {
-                if (fs::is_regular_file(it->status())) {
-                    fs::remove(it->path());
+            for (boost::filesystem::directory_iterator it(folder); it != boost::filesystem::directory_iterator(); ++it) {
+                if (boost::filesystem::is_regular_file(it->status())) {
+                    boost::filesystem::remove(it->path());
                 }
             }
         }
