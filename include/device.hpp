@@ -2,21 +2,16 @@
 #define DEVICE_HPP
 
 #include <librealsense2/rs.hpp>
-#include <pcl/io/pcd_io.h>
+#include <pcl/pcl_exports.h>
 #include <pcl/point_types.h>
-#include <pcl/filters/passthrough.h>
-#include <pcl/common/common_headers.h>
-#include <pcl/features/normal_3d.h>
-#include <pcl/visualization/pcl_visualizer.h>
-#include <pcl/console/parse.h>
-#include <boost/thread/thread.hpp>
-#include <pcl/io/io.h>
-#include <pcl/visualization/cloud_viewer.h>
+#include <pcl/impl/point_types.hpp>
+#include <pcl/io/pcd_io.h>
 #include <unistd.h>
 #include <iostream>
 
-typedef pcl::PointCloud<pcl::PointXYZRGB> pcl_pc;
-typedef pcl_pc::Ptr pcPointer;
+typedef pcl::PointXYZRGB RGB_Cloud;
+typedef pcl::PointCloud<RGB_Cloud> point_cloud;
+typedef point_cloud::Ptr cloud_pointer;
 
 class Device
 {
@@ -30,7 +25,8 @@ private:
 public:
 	Device();
 	void get_pc(rs2::points& in_points, rs2::video_frame& in_color);
-	void convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcPointer& cloud_pointer);
+	void convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, cloud_pointer& cloud_ptr);
+	void savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc);
 	~Device();
 	
 };

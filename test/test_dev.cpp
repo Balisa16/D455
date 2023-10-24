@@ -6,10 +6,11 @@ int main()
 	Device dev;
 	int counter = 10;
 	rs2::points pc;
+	rs2::video_frame frame;
 
 	while(counter)
 	{
-		dev.get_pc(pc);
+		dev.get_pc(pc, frame);
 		std::cout << std::fixed << std::setprecision(2) << "\n\n";
 		auto vert = pc.get_vertices();
 		for (int i = 0; i < pc.size(); ++i)

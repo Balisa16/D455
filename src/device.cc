@@ -43,9 +43,14 @@ void Device::get_pc(rs2::points& points, rs2::video_frame& color)
     points = pc.calculate(depth);
 }
 
-void Device::convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcPointer& cloud_pointer);
+void Device::convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, cloud_pointer& cloud_ptr)
 {
 
+}
+
+void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc)
+{
+	int ret = pcl::io::savePCDFile("test", pc);
 }
 
 Device::~Device()
