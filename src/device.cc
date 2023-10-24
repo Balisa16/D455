@@ -43,7 +43,7 @@ void Device::get_pc(rs2::points& points, rs2::video_frame& color, int loop)
         float _div = loop/20.0f;
         for(int j = 0; j < i; j += _div)
             std::cout << "▇";
-        for(int j = i; j < loop; j += _div)
+        for(int j = i; j <= loop; j += _div)
             std::cout << " ";
         std::cout << "] " << (int)(i*100/loop) << "%     \r";
         std::cout.flush();
