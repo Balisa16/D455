@@ -31,9 +31,9 @@ Device::Device()
 	std::cout << "D455 Camera is ON\n";
 }
 
-void Device::get_pc(rs2::points& points, rs2::video_frame& color)
+void Device::get_pc(rs2::points& points, rs2::video_frame& color, int loop)
 {
-	for(int i = 0; i < 10; i++)
+	for(int i = 0; i < loop; i++)
         frames = pipe.wait_for_frames();
     color = frames.get_color_frame();
     if (!color)
@@ -43,14 +43,57 @@ void Device::get_pc(rs2::points& points, rs2::video_frame& color)
     points = pc.calculate(depth);
 }
 
-void Device::convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, cloud_pointer& cloud_ptr)
+void Device::RGB_Texture(rs2::video_frame& texture, rs2::texture_coordinate Texture_XY, RGB& out_RGB)
 {
+    int width  = texture.get_width();
+    int height = texture.get_height();
+    
+    int x_value = std::min(std::max(int(Texture_XY.u * width  + .5f), 0), width - 1);
+    int y_value = std::min(std::max(int(Texture_XY.v * height + .5f), 0), height - 1);
 
+    int bytes = x_value * texture.get_bytes_per_pixel();
+    int strides = y_value * texture.get_stride_in_bytes();
+    int Text_Index =  (bytes + strides);
+
+    const auto New_Texture = reinterpret_cast<const uint8_t*>(texture.get_data());
+    
+    // RGB components to save in tuple
+    out_RGB.b = New_Texture[Text_Index];
+    out_RGB.g = New_Texture[Text_Index + 1];
+    out_RGB.r = New_Texture[Text_Index + 2];
 }
 
-void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc)
+void Device::convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output)
 {
-	int ret = pcl::io::savePCDFile("test", pc);
+    auto sp = in_points.get_profile().as<rs2::video_stream_profile>();
+    
+    output.width  = static_cast<uint32_t>( sp.width()  );   
+    output.height = static_cast<uint32_t>( sp.height() );
+    output.is_dense = false;
+    output.points.resize( in_points.size() );
+
+    auto Texture_Coord = in_points.get_texture_coordinates();
+    auto Vertex = in_points.get_vertices();
+
+    RGB temp_rgb;
+    for (int i = 0; i < in_points.size(); i++)
+    {
+        output.points[i].x = Vertex[i].x;
+        output.points[i].y = Vertex[i].y;
+        output.points[i].z = Vertex[i].z;
+
+        RGB_Texture(in_color, Texture_Coord[i], temp_rgb);
+
+        output.points[i].r = temp_rgb.r;
+        output.points[i].g = temp_rgb.g;
+        output.points[i].b = temp_rgb.b;
+    }
+}
+
+void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, std::string file_name)
+{
+	int ret = pcl::io::savePCDFile(file_name.c_str(), pc);
+    std::cout << "Save status : " << ret << '\n';
 }
 
 Device::~Device()

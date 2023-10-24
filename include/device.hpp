@@ -9,8 +9,11 @@
 #include <unistd.h>
 #include <iostream>
 
-typedef pcl::PointXYZRGB RGB_Cloud;
-typedef pcl::PointCloud<RGB_Cloud> point_cloud;
+struct RGB{
+	float r, g, b;
+};
+
+typedef pcl::PointCloud<pcl::PointXYZRGB> point_cloud;
 typedef point_cloud::Ptr cloud_pointer;
 
 class Device
@@ -22,11 +25,13 @@ private:
 
 	rs2::pointcloud pc;
 	rs2::frameset frames;
+
+	void RGB_Texture(rs2::video_frame& texture, rs2::texture_coordinate Texture_XY, RGB& out_RGB);
 public:
 	Device();
-	void get_pc(rs2::points& in_points, rs2::video_frame& in_color);
-	void convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, cloud_pointer& cloud_ptr);
-	void savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc);
+	void get_pc(rs2::points& in_points, rs2::video_frame& in_color, int loop = 10);
+	void convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output);
+	void savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, std::string file_name = "D455.pcd");
 	~Device();
 	
 };

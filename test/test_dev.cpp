@@ -10,18 +10,25 @@ int main()
 	rs2::frame f;
 	rs2::video_frame frame(f);
 
+	pcl::PointCloud<pcl::PointXYZRGB> pcl_pc;
+
 	std::cout << std::fixed << std::setprecision(2);
 	std::chrono::time_point<std::chrono::high_resolution_clock> t_now, t_past = std::chrono::high_resolution_clock::now();
 	while(counter)
 	{
-		dev.get_pc(pc, frame);
+		dev.get_pc(pc, frame, 100);
 		auto vert = pc.get_vertices();
+
+		dev.convert_to_PCL(pc, frame, pcl_pc);
+		dev.savePCD(pcl_pc, "test.pcd");
+
 		t_now = std::chrono::high_resolution_clock::now();
 		std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(t_now-t_past);
 		t_past = t_now;
 		float _fps = 1000000 / duration.count();
 		std::cout << "FPS : " << _fps << "   \r";
 		std::cout.flush();
+
 
 		/*for (int i = 0; i < pc.size(); ++i)
 		{
@@ -35,9 +42,9 @@ int main()
 			"\n\ty : " << vert->y << 
 			"\n\tz : " << vert->z << std::endl;
 		std::cout << counter << "TC : " << tex_coord->v << std::endl;*/
-
+		break;
 		counter--;
 	}
-	std::cout << std::endl;
+	std::cout << '\n';
 	return 0;
 }
