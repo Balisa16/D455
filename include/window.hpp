@@ -14,6 +14,7 @@
 #include <memory>
 #include <shader.hpp>
 #include <callback.hpp>
+#include <librealsense2/rs.hpp>
 
 // extern const char *vertexShaderSource;
 // extern const char *fragmentShaderSource;
@@ -91,6 +92,7 @@ public:
     void clear_buffer();
     void bind_texture();
     void draw(std::shared_ptr<Shader> shader);
+    void draw_pc(rs2::points& points);
     void swap_poll();
 
     // Getter

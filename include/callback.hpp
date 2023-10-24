@@ -34,11 +34,8 @@ extern glm::vec3 CAMERA_UP;
 extern bool first_mouse;
 extern float yaw;
 extern float pitch;
-extern float LAST_X;
-extern float LAST_Y;
 extern float FOV;
 
-extern bool left_pressed;
 extern bool right_pressed;
 extern MousePos LPos_press;
 

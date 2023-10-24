@@ -8,10 +8,6 @@
 #include <librealsense2/rs.hpp>
 #include <algorithm>
 
-//////////////////////////////
-// Demos Helpers            //
-//////////////////////////////
-
 // Find devices with specified streams
 bool device_with_streams(std::vector <rs2_stream> stream_requests, std::string& out_serial)
 {

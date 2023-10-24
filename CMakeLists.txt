@@ -25,6 +25,7 @@ include_directories(
 add_library(ADDED_LIBS STATIC
     src/callback.cc
     src/window.cc
+    src/device.cc
     src/shader.cc
     src/glad.c
     src/stb_image.cc)

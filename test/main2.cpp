@@ -1,32 +1,4 @@
-#include <window.hpp>
-
-/*
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
-*/
-
-struct Position{
-    float x, y, z;
-};
-
-struct TexCoord{
-    float s, t;
-};
-
-struct PCData{
-    Position pos;
-    TexCoord tx;
-};
+#include "../include/window.hpp"
 
 window::window(std::string title, int width, int height):
     title(title), width(width), height(height)
@@ -87,8 +59,6 @@ void window::bind_texture()
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture2);
 }
 
 void window::draw(std::shared_ptr<Shader> shader)
@@ -104,11 +74,6 @@ void window::draw(std::shared_ptr<Shader> shader)
         shader->setM4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
-}
-
-void window::draw_pc(rs2::points& points)
-{
-    
 }
 
 void window::swap_poll()
@@ -137,11 +102,12 @@ void window::conf_vertex()
 
     // texture 1
     // ---------
+    glEnable(GL_TEXTURE_2D);
     glGenTextures(1, &texture1);
     glBindTexture(GL_TEXTURE_2D, texture1);
     // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // GL_CLAMP_TO_EDGE
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // GL_CLAMP_TO_EDGE
     // set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -159,31 +125,67 @@ void window::conf_vertex()
         std::cout << "Failed to load texture" << std::endl;
     }
     stbi_image_free(data);
-
-    // texture 2
-    // ---------
-    glGenTextures(1, &texture2);
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
-    data = stbi_load("../assets/awface.png", &width, &height, &nrChannels, 0);
-    if(data)
-    {
-        // note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
+    glBegin(GL_POINTS);
 }
+
+void window::draw_pc(rs2::points& points)
+{
+    if (!points.size())
+        return;
+
+    // OpenGL commands that prep screen for the pointcloud
+    glLoadIdentity();
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+    glClearColor(153.f / 255, 153.f / 255, 153.f / 255, 1);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+
+    glTranslatef(0, 0, +0.5f * 0.05f);
+    // glTranslatef(0, 0, +0.5f + app_state.offset_y * 0.05f);
+    // glRotated(app_state.pitch, 1, 0, 0);
+    // glRotated(app_state.yaw, 0, 1, 0);
+    glRotated(0, 1, 0, 0);
+    glRotated(0, 0, 1, 0);
+    glTranslatef(0, 0, -0.5f);
+
+    glPointSize(width / 640);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    float tex_border_color[] = { 0.8f, 0.8f, 0.8f, 0.8f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, tex_border_color);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // GL_CLAMP_TO_EDGE
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // GL_CLAMP_TO_EDGE
+    glBegin(GL_POINTS);
+
+
+    /* this segment actually prints the pointcloud */
+    auto vertices = points.get_vertices();              // get vertices
+    auto tex_coords = points.get_texture_coordinates(); // and texture coordinates
+    for (int i = 0; i < points.size(); i++)
+    {
+        if (vertices[i].z)
+        {
+            // upload the point and texture coordinates only for points we have depth data for
+            glVertex3fv(vertices[i]);
+            glTexCoord2fv(tex_coords[i]);
+        }
+    }
+
+    // OpenGL cleanup
+    glEnd();
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glPopAttrib();
+}
+
 
 float window::get_fov(){ return FOV;}
 
@@ -196,4 +198,32 @@ window::~window()
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glfwTerminate();
+}
+
+
+int main(int argc, char **argv)
+{
+    window win;
+    Shader shader;
+    std::cout.flush();
+    shader.init("../test/main.vert", "../test/main.frag");
+    shader.use();
+    win.conf_vertex();
+    shader.use();
+    shader.setI("texture1", 0);
+    shader.setI("texture2", 1);
+    while (win.is_open())
+    {
+        win.processinput();
+        win.clear_buffer();
+        win.bind_texture();
+        glm::mat4 projection = glm::perspective(glm::radians(win.get_fov()), win.get_width() / win.get_height() , 0.1f, 100.0f);
+        glm::mat4 view = glm::lookAt(CAMERA_POS, CAMERA_POS + CAMERA_FRONT, CAMERA_UP);
+        shader.use();
+        shader.setM4("projection", projection);
+        shader.setM4("view", view);
+        win.draw(std::make_shared<Shader>(shader));
+        win.swap_poll();
+    }
+    return 0;
 }
