@@ -68,7 +68,7 @@ void Device::check_dir(std::string folder)
 
     if(!is_empty)
     {
-        std::cout << "Pointcloud folder isn't empty. Do you want to delete all file on pointcloud folder ? [y/n] ";
+        std::cout << "Pointcloud folder isn't empty. Delete all file ? [y/n] ";
         std::cout.flush();
         char in_char;
         std::cin >> in_char;
