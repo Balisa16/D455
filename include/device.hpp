@@ -9,6 +9,7 @@
 #include <pcl/io/pcd_io.h>
 #include <unistd.h>
 #include <iostream>
+#include <math>
 
 struct RGB{
 	float r, g, b;
