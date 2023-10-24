@@ -2,6 +2,7 @@
 #define DEVICE_HPP
 
 #include <librealsense2/rs.hpp>
+#include <boost/filesystem.hpp>
 #include <pcl/pcl_exports.h>
 #include <pcl/point_types.h>
 #include <pcl/impl/point_types.hpp>
@@ -26,6 +27,7 @@ private:
 	rs2::pointcloud pc;
 	rs2::frameset frames;
 
+	void check_dir(std::string folder = "pointcloud");
 	void RGB_Texture(rs2::video_frame& texture, rs2::texture_coordinate Texture_XY, RGB& out_RGB);
 public:
 	Device();

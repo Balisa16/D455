@@ -43,6 +43,19 @@ void Device::get_pc(rs2::points& points, rs2::video_frame& color, int loop)
     points = pc.calculate(depth);
 }
 
+void Device::check_dir(std::string folder)
+{
+    if(!boost::filesystem::exists(folder))
+    {
+        std::cout << "Create pointcloud folder\n";
+        if(!boost::filesystem::create_directory(folder))
+        {
+            std::cout << "Failed create pointcloud folder\n";
+            throw;
+        }
+    }
+}
+
 void Device::RGB_Texture(rs2::video_frame& texture, rs2::texture_coordinate Texture_XY, RGB& out_RGB)
 {
     int width  = texture.get_width();

@@ -8,6 +8,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 find_package(PCL REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system filesystem)
 
 add_subdirectory(thirdparty/glfw)
 add_subdirectory(thirdparty/glm)
@@ -36,7 +37,10 @@ add_library(ADDED_LIBS STATIC
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-target_link_libraries(ADDED_LIBS PRIVATE glfw)
+target_link_libraries(ADDED_LIBS PRIVATE 
+    glfw
+    Boost::system 
+    Boost::filesystem)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/release)
 
