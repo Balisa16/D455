@@ -85,7 +85,7 @@ void Device::check_dir(std::string folder)
         std::cin >> in_char;
         if(in_char == 'y' || in_char == 'Y')
         {
-            std::cout << "\033[32mDelete all\033[0m file in pointcloud folder\n";
+            std::cout << "\033[32mDelete All\033[0m file in pointcloud folder\n";
             for (boost::filesystem::directory_iterator it(pc_folder); it != boost::filesystem::directory_iterator(); ++it) {
                 if (boost::filesystem::is_regular_file(it->status())) {
                     boost::filesystem::remove(it->path());
@@ -132,8 +132,8 @@ void Device::convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, 
     {
         output.points[i].x = Vertex[i].x;
         output.points[i].y = Vertex[i].y;
-        output.points[i].z = Vertex[i].z;
-
+        output.points[i].z = Vertex[i].z < 5.0f ? Vertex[i].z : 5.0f;
+        
         RGB_Texture(in_color, Texture_Coord[i], temp_rgb);
 
         output.points[i].r = temp_rgb.r;
@@ -145,7 +145,8 @@ void Device::convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, 
 void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, std::string file_name)
 {
 	int ret = pcl::io::savePCDFile((pc_folder + "/" + file_name).c_str(), pc);
-    std::cout << "Save status : " << ret << '\n';
+    if(ret != 0)
+        std::cout << "PCD Export is FAILED. Status : " << ret << '\n';
 }
 
 Device::~Device()
