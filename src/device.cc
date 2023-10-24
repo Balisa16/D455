@@ -48,10 +48,11 @@ void Device::get_pc(rs2::points& points, rs2::video_frame& color, int loop)
 
 void Device::check_dir(std::string folder)
 {
-    if(!boost::filesystem::exists(folder))
+    pc_folder = folder;
+    if(!boost::filesystem::exists(pc_folder))
     {
         std::cout << "Create pointcloud folder\n";
-        if(!boost::filesystem::create_directory(folder))
+        if(!boost::filesystem::create_directory(pc_folder))
         {
             std::cout << "Failed create pointcloud folder\n";
             throw;
@@ -59,7 +60,7 @@ void Device::check_dir(std::string folder)
     }
 
     bool is_empty = true;
-    for (boost::filesystem::directory_iterator it(folder); it != boost::filesystem::directory_iterator(); ++it)
+    for (boost::filesystem::directory_iterator it(pc_folder); it != boost::filesystem::directory_iterator(); ++it)
     {
         is_empty =  false;
         break;
@@ -74,7 +75,7 @@ void Device::check_dir(std::string folder)
         if(in_char == 'y' || in_char == 'Y')
         {
             std::cout << "\033[32mDelete all\033[0m file in pointcloud folder\n";
-            for (boost::filesystem::directory_iterator it(folder); it != boost::filesystem::directory_iterator(); ++it) {
+            for (boost::filesystem::directory_iterator it(pc_folder); it != boost::filesystem::directory_iterator(); ++it) {
                 if (boost::filesystem::is_regular_file(it->status())) {
                     boost::filesystem::remove(it->path());
                 }
@@ -132,7 +133,7 @@ void Device::convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, 
 
 void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, std::string file_name)
 {
-	int ret = pcl::io::savePCDFile(file_name.c_str(), pc);
+	int ret = pcl::io::savePCDFile((pc_folder + "/" + file_name).c_str(), pc);
     std::cout << "Save status : " << ret << '\n';
 }
 
