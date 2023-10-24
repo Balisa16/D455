@@ -7,6 +7,8 @@ if(NOT CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
+find_package(PCL REQUIRED)
+
 add_subdirectory(thirdparty/glfw)
 add_subdirectory(thirdparty/glm)
 add_subdirectory(thirdparty/librealsense)
@@ -15,6 +17,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(DEPENDENCIES realsense2)
 
 include_directories(
+    ${PCL_INCLUDE_DIRS}
     thirdparty/glfw/include
     thirdparty/glfw/src
     thirdparty/glm/glm
@@ -29,6 +32,9 @@ add_library(ADDED_LIBS STATIC
     src/shader.cc
     src/glad.c
     src/stb_image.cc)
+
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 
 target_link_libraries(ADDED_LIBS PRIVATE glfw)
 
@@ -46,6 +52,7 @@ foreach(SRC_FILE ${SRC_FILES})
         glfw 
         glm 
         ADDED_LIBS
+        ${PCL_LIBRARIES}
         realsense2)
     target_include_directories(${TARGET_NAME} PRIVATE
         thirdparty/glfw/include
