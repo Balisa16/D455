@@ -40,7 +40,6 @@ int main()
 			"\n\ty : " << vert->y << 
 			"\n\tz : " << vert->z << std::endl;
 		std::cout << counter << "TC : " << tex_coord->v << std::endl;*/
-		break;
 		counter--;
 	}
 	return 0;
