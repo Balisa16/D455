@@ -1,7 +1,10 @@
 #include <device.hpp>
 
 
-Device::Device()
+Device::Device() : 
+    builder(),
+    writer(builder.newStreamWriter()),
+    output_file("resume.json")
 {
     // Check folder for pointcloud
     check_dir();
@@ -40,15 +43,24 @@ void Device::get_pc(rs2::points& points, rs2::video_frame& color, int loop)
     {
         frames = pipe.wait_for_frames();
         std::cout << "Frame : [";
-        float _div = loop/20.0f;
+        if((i/(float)loop) < 0.3f)
+            std::cout << "\033[31m";
+        else if((i/(float)loop) > 0.7f)
+            std::cout << "\033[32m";
+        else
+            std::cout << "\033[33m";
+        float _div = loop/30.0f;
         for(int j = 0; j <= i; j += _div)
             std::cout << "▇";
         for(int j = i+1; j <= loop; j += _div)
             std::cout << " ";
-        std::cout << "] " << (int)(i*100/loop) << "%     \r";
+        std::cout << "\033[0m] " << (int)(i*100/loop);
+        if(i < loop)
+            std::cout << "%  \r";
+        else
+            std::cout << "% \033[32m[OK]\033[0m\n";
         std::cout.flush();
     }
-    std::cout << '\n';
     color = frames.get_color_frame();
     if (!color)
         color = frames.get_infrared_frame();
@@ -115,7 +127,7 @@ void Device::RGB_Texture(rs2::video_frame& texture, rs2::texture_coordinate Text
     out_RGB.r = New_Texture[Text_Index + 2];
 }
 
-void Device::convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output)
+void Device::convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output, float depth_lim)
 {
     auto sp = in_points.get_profile().as<rs2::video_stream_profile>();
     
@@ -132,7 +144,7 @@ void Device::convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, 
     {
         output.points[i].x = Vertex[i].x;
         output.points[i].y = Vertex[i].y;
-        output.points[i].z = Vertex[i].z < 5.0f ? Vertex[i].z : 5.0f;
+        output.points[i].z = Vertex[i].z < depth_lim ? Vertex[i].z : depth_lim;
         
         RGB_Texture(in_color, Texture_Coord[i], temp_rgb);
 
@@ -144,12 +156,28 @@ void Device::convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, 
 
 void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, std::string file_name)
 {
-	int ret = pcl::io::savePCDFile((pc_folder + "/" + file_name).c_str(), pc);
-    if(ret != 0)
-        std::cout << "PCD Export is FAILED. Status : " << ret << '\n';
+    std::string formatted_name = file_name + std::to_string(filename_idx) + ".pcd";
+
+    // Get current time
+    auto currentTime = std::chrono::system_clock::now();
+    std::time_t time = std::chrono::system_clock::to_time_t(currentTime);
+    std::tm timeInfo;
+    localtime_r(&time, &timeInfo);
+    char buffer[20];
+    std::strftime(buffer, sizeof(buffer), "%Y/%m/%d %H:%M:%S", &timeInfo);
+
+    root["filename"] = "robin";
+    root["time"] = buffer;
+    writer->write(root, &output_file);
+    filename_idx++;
+	int ret = pcl::io::savePCDFile((pc_folder + '/' + formatted_name).c_str(), pc);
+    if(ret == 0)
+        std::cout << "\033[32mSaved " << formatted_name << "\033[0m\n";
+    else
+        std::cout << "\033[31mPCD Export FAILED\033[0m. Status : " << ret << '\n';
 }
 
 Device::~Device()
 {
-
+    output_file.close();
 }

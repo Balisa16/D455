@@ -19,8 +19,8 @@ int main()
 		dev.get_pc(pc, frame, 100);
 		auto vert = pc.get_vertices();
 
-		dev.convert_to_PCL(pc, frame, pcl_pc);
-		dev.savePCD(pcl_pc, "test.pcd");
+		dev.convert_to_PCL(pc, frame, pcl_pc, 3.0f);
+		dev.savePCD(pcl_pc);
 
 		t_now = std::chrono::high_resolution_clock::now();
 		std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(t_now-t_past);

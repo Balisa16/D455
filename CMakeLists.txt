@@ -9,6 +9,7 @@ endif()
 
 find_package(PCL REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system filesystem)
+find_package(jsoncpp REQUIRED)
 
 add_subdirectory(thirdparty/glfw)
 add_subdirectory(thirdparty/glm)
@@ -39,6 +40,7 @@ add_definitions(${PCL_DEFINITIONS})
 
 target_link_libraries(ADDED_LIBS PRIVATE 
     glfw
+    jsoncpp
     Boost::system 
     Boost::filesystem)
 
