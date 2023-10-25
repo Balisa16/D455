@@ -5,7 +5,7 @@
 int main()
 {
 	Device dev;
-	int counter = 10;
+	int counter = 5;
 	rs2::points pc;
 	rs2::frame f;
 	rs2::video_frame frame(f);

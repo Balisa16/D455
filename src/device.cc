@@ -3,10 +3,8 @@
 
 Device::Device() : 
     builder(),
-    writer(builder.newStreamWriter()),
-    output_file("resume.json")
+    writer(builder.newStreamWriter())
 {
-    // Check folder for pointcloud
     check_dir();
 
 	cfg.enable_stream(RS2_STREAM_COLOR);
@@ -43,17 +41,21 @@ void Device::get_pc(rs2::points& points, rs2::video_frame& color, int loop)
     {
         frames = pipe.wait_for_frames();
         std::cout << "Frame : [";
+
+        // Bar color
         if((i/(float)loop) < 0.3f)
             std::cout << "\033[31m";
         else if((i/(float)loop) > 0.7f)
             std::cout << "\033[32m";
         else
             std::cout << "\033[33m";
+
         float _div = loop/30.0f;
         for(int j = 0; j <= i; j += _div)
             std::cout << "▇";
         for(int j = i+1; j <= loop; j += _div)
             std::cout << " ";
+
         std::cout << "\033[0m] " << (int)(i*100/loop);
         if(i < loop)
             std::cout << "%  \r";
@@ -71,40 +73,51 @@ void Device::get_pc(rs2::points& points, rs2::video_frame& color, int loop)
 
 void Device::check_dir(std::string folder)
 {
-    pc_folder = folder;
-    if(!boost::filesystem::exists(pc_folder))
-    {
-        std::cout << "Create pointcloud folder\n";
-        if(!boost::filesystem::create_directory(pc_folder))
-        {
-            std::cout << "Failed create pointcloud folder\n";
-            throw;
-        }
-    }
+    out_folder = folder;
+    std::vector<std::string> f;
+    f.push_back(out_folder);
+    f.push_back(out_folder + "/pointcloud");
+    f.push_back(out_folder + "/resume");
 
-    bool is_empty = true;
-    for (boost::filesystem::directory_iterator it(pc_folder); it != boost::filesystem::directory_iterator(); ++it)
+    for (int i = 0; i < f.size(); ++i)
     {
-        is_empty =  false;
-        break;
-    }
-
-    if(!is_empty)
-    {
-        std::cout << "Pointcloud folder isn't empty. Delete all file ? [y/n] ";
-        std::cout.flush();
-        char in_char;
-        std::cin >> in_char;
-        if(in_char == 'y' || in_char == 'Y')
-        {
-            std::cout << "\033[32mDelete All\033[0m file in pointcloud folder\n";
-            for (boost::filesystem::directory_iterator it(pc_folder); it != boost::filesystem::directory_iterator(); ++it) {
-                if (boost::filesystem::is_regular_file(it->status())) {
-                    boost::filesystem::remove(it->path());
-                }
+        if(!boost::filesystem::exists(f[i]))
+            if(!boost::filesystem::create_directory(f[i]))
+            {
+                std::cout << "Failed create " << f[i] << '\n';
+                throw;
             }
-        }
     }
+
+
+    // Check poitcloud folder
+    int pc_folder_idx = 0;
+    while(true)
+    {
+        bool en = false, empty = true;
+        for (const boost::filesystem::directory_entry& entry : boost::filesystem::directory_iterator(out_folder + "/pointcloud")) {
+            empty = false;
+            std::cout << std::atoi(entry.path().filename().string().c_str()) << " => " <<  pc_folder_idx << '\n';
+            if (boost::filesystem::is_directory(entry.path()) && std::atoi(entry.path().filename().string().c_str()) == pc_folder_idx)
+            {
+                en = true;
+                break;
+            }
+                
+        }
+        if(!en || empty)
+            break;
+        pc_folder_idx++;
+    }
+
+    boost::filesystem::create_directory(out_folder + "/pointcloud/" + std::to_string(pc_folder_idx));
+
+    pc_folder = out_folder + "/pointcloud/" + std::to_string(pc_folder_idx) + '/';
+    std::cout << "Pointcloud output in " <<  pc_folder << '\n';
+
+    // Check folder for pointcloud
+    output_file.open(out_folder + "/resume/resume" + std::to_string(pc_folder_idx) + ".json");
+    if(!output_file.is_open())throw;
 }
 
 void Device::RGB_Texture(rs2::video_frame& texture, rs2::texture_coordinate Texture_XY, RGB& out_RGB)
@@ -166,11 +179,14 @@ void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, std::string file_nam
     char buffer[20];
     std::strftime(buffer, sizeof(buffer), "%Y/%m/%d %H:%M:%S", &timeInfo);
 
-    root["filename"] = "robin";
+    root["filename"] = formatted_name.c_str();
     root["time"] = buffer;
+    if(filename_idx > 1)
+        output_file << ",\n";
     writer->write(root, &output_file);
     filename_idx++;
-	int ret = pcl::io::savePCDFile((pc_folder + '/' + formatted_name).c_str(), pc);
+
+	int ret = pcl::io::savePCDFile((pc_folder + formatted_name).c_str(), pc);
     if(ret == 0)
         std::cout << "\033[32mSaved " << formatted_name << "\033[0m\n";
     else

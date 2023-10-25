@@ -34,11 +34,12 @@ private:
 	rs2::pointcloud pc;
 	rs2::frameset frames;
 
-	std::string pc_folder = "pointcloud";
+	std::string out_folder, pc_folder;
+
 
 	int filename_idx = 1;
 
-	void check_dir(std::string folder = "pointcloud");
+	void check_dir(std::string folder = "../output");
 	void RGB_Texture(rs2::video_frame& texture, rs2::texture_coordinate Texture_XY, RGB& out_RGB);
 
 	// JSON Writer
