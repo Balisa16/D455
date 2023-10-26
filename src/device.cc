@@ -5,19 +5,19 @@ namespace EMIRO
 {
     void frames_update(
         std::mutex* mtx,
-        rs2::pipeline* pipe,
-        rs2::pointcloud* pc,
-        rs2::points* point,
-        rs2::video_frame* color,
-        rs2::depth_frame* depth)
+        rs2::pipeline& pipe,
+        rs2::pointcloud& pc,
+        rs2::points& point,
+        rs2::video_frame& color,
+        rs2::depth_frame& depth)
     {
-        rs2::frameset frames = pipe->wait_for_frames();
-        color = &frames.get_color_frame();
+        rs2::frameset frames = pipe.wait_for_frames();
+        color = frames.get_color_frame();
         if (!color)
-            color = &frames.get_infrared_frame();
-        pc->map_to(color);
-        depth = &frames.get_depth_frame();
-        point = &(pc->calculate(depth));
+            color = frames.get_infrared_frame();
+        pc.map_to(color);
+        depth = frames.get_depth_frame();
+        point = pc.calculate(depth);
 
         t_now = std::chrono::high_resolution_clock::now();
         std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(t_now - t_past);
@@ -87,7 +87,7 @@ namespace EMIRO
             depth_sensor.set_option(RS2_OPTION_LASER_POWER, 0.f); // Disable laser
         }
         std::cout << "D455 Camera is ON\n";
-        th = std::thread(frames_update, &mtx, &pc, &point, &color, &depth);
+        th = std::thread(frames_update, &mtx, pipe, pc, point, color, &depth);
         th.detach();
     }
 

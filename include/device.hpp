@@ -24,11 +24,11 @@ namespace EMIRO
 {
 	void frames_update(
         std::mutex* mtx,
-        rs2::pipeline* pipe,
-        rs2::pointcloud* pc,
-        rs2::points* point,
-        rs2::video_frame* color,
-        rs2::depth_frame* depth);
+        rs2::pipeline& pipe,
+        rs2::pointcloud& pc,
+        rs2::points& point,
+        rs2::video_frame& color,
+        rs2::depth_frame& depth);
 
 	struct RGB{
 		float r, g, b;
