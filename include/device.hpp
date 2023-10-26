@@ -22,16 +22,13 @@
 
 namespace EMIRO
 {
-	extern std::string serial;
-	extern rs2::pipeline pipe;
-	extern rs2::config cfg;
-
-	extern std::shared_ptr<rs2::frameset> frames;
-
-	extern std::chrono::time_point<std::chrono::high_resolution_clock> t_now, t_past;
-	extern std::mutex mtx;
-
-	void frames_update();
+	void frames_update(
+        std::mutex* mtx,
+        rs2::pipeline* pipe,
+        rs2::pointcloud* pc,
+        rs2::points* point,
+        rs2::video_frame* color,
+        rs2::depth_frame* depth);
 
 	struct RGB{
 		float r, g, b;
@@ -43,8 +40,15 @@ namespace EMIRO
 	class Device
 	{
 	private:
-		rs2::pointcloud pc;
+		std::string serial;
+	    rs2::pipeline pipe;
+	    rs2::config cfg;
+	    rs2::pointcloud pc;
+	    rs2::points point;
+    	rs2::video_frame color;
 
+    	std::chrono::time_point<std::chrono::high_resolution_clock> t_now, t_past;
+    	std::mutex mtx;
 		std::string out_folder, pc_folder;
 
 		int filename_idx = 1;
