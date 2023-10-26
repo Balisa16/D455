@@ -4,6 +4,7 @@
 
 int main(int argc, char **argv)
 {
+    std::cout << "Sander" << std::endl;
     window win;
     Shader shader;
     std::cout.flush();

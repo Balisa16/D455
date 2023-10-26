@@ -41,6 +41,7 @@ add_definitions(${PCL_DEFINITIONS})
 target_link_libraries(ADDED_LIBS PRIVATE 
     glfw
     jsoncpp
+    pthread
     Boost::system 
     Boost::filesystem)
 

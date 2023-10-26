@@ -4,11 +4,12 @@
 
 int main()
 {
-	Device dev;
+	EMIRO::Device dev;
 	int counter = 5;
 	rs2::points pc;
 	rs2::frame f;
 	rs2::video_frame frame(f);
+	dev.get_pc(pc, frame, 200);
 
 	pcl::PointCloud<pcl::PointXYZRGB> pcl_pc;
 
