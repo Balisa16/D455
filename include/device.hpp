@@ -24,7 +24,7 @@ namespace EMIRO
 {
 	extern void frames_update(
 		std::mutex& mtx, 
-		rs2::frameset& frames,
+		std::shared_ptr<rs2::frameset> frames,
 		rs2::pipeline& pipe,
 		std::chrono::time_point<std::chrono::high_resolution_clock>& t_now,
 		std::chrono::time_point<std::chrono::high_resolution_clock>& t_past);
@@ -35,7 +35,7 @@ namespace EMIRO
 		rs2::pipeline pipe;
 		rs2::config cfg;
 
-		rs2::frameset frames;
+		std::shared_ptr<rs2::frameset> frames;
 
 		std::chrono::time_point<std::chrono::high_resolution_clock> t_now, t_past;
 		std::mutex mtx;
@@ -56,7 +56,6 @@ namespace EMIRO
 		rs2::pointcloud pc;
 
 		std::string out_folder, pc_folder;
-
 
 		int filename_idx = 1;
 

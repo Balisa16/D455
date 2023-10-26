@@ -5,13 +5,14 @@ namespace EMIRO
 {
     void frames_update(
         std::mutex& mtx, 
-        rs2::frameset& frames,
+        std::shared_ptr<rs2::frameset> frames,
         rs2::pipeline& pipe,
         std::chrono::time_point<std::chrono::high_resolution_clock>& t_now,
         std::chrono::time_point<std::chrono::high_resolution_clock>& t_past)
     {
+        while(!mtx.try_lock());
         mtx.lock();
-        frames = pipe.wait_for_frames();
+        frames = std::make_shared<rs2::frameset>(pipe.wait_for_frames());
         mtx.unlock();
 
         t_now = std::chrono::high_resolution_clock::now();
@@ -94,11 +95,14 @@ namespace EMIRO
 
     void Device::get_pc(rs2::points& points, rs2::video_frame& color, int loop)
     {
-        color = frames.get_color_frame();
+        while(!mtx.try_lock());
+        mtx.lock();
+        color = frames->get_color_frame();
         if (!color)
-            color = frames.get_infrared_frame();
+            color = frames->get_infrared_frame();
         pc.map_to(color);
-        auto depth = frames.get_depth_frame();
+        auto depth = frames->get_depth_frame();
+        mtx.unlock();
         points = pc.calculate(depth);
     }
 
