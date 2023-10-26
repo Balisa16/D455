@@ -22,26 +22,16 @@
 
 namespace EMIRO
 {
-	extern void frames_update(
-		std::mutex& mtx, 
-		std::shared_ptr<rs2::frameset> frames,
-		rs2::pipeline& pipe,
-		std::chrono::time_point<std::chrono::high_resolution_clock>& t_now,
-		std::chrono::time_point<std::chrono::high_resolution_clock>& t_past);
+	extern std::string serial;
+	extern rs2::pipeline pipe;
+	extern rs2::config cfg;
 
-	class FrameThread{
-	protected:
-		std::string serial;
-		rs2::pipeline pipe;
-		rs2::config cfg;
+	extern std::shared_ptr<rs2::frameset> frames;
 
-		std::shared_ptr<rs2::frameset> frames;
+	extern std::chrono::time_point<std::chrono::high_resolution_clock> t_now, t_past;
+	extern std::mutex mtx;
 
-		std::chrono::time_point<std::chrono::high_resolution_clock> t_now, t_past;
-		std::mutex mtx;
-	};
-	// Global frames
-	
+	void frames_update();
 
 	struct RGB{
 		float r, g, b;
@@ -50,7 +40,7 @@ namespace EMIRO
 	typedef pcl::PointCloud<pcl::PointXYZRGB> point_cloud;
 	typedef point_cloud::Ptr cloud_pointer;
 
-	class Device : FrameThread
+	class Device
 	{
 	private:
 		rs2::pointcloud pc;
@@ -74,7 +64,7 @@ namespace EMIRO
 	public:
 
 		Device();
-		void get_pc(rs2::points& in_points, rs2::video_frame& in_color, int loop = 10);
+		void get_pc(rs2::points& p, rs2::video_frame& c, int loop = 10);
 		void convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output, float depth_lim = 5.0f);
 		void savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, std::string file_name = "pointcloud");
 		~Device();

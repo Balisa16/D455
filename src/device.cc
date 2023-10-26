@@ -3,16 +3,23 @@
 
 namespace EMIRO
 {
-    void frames_update(
-        std::mutex& mtx, 
-        std::shared_ptr<rs2::frameset> frames,
-        rs2::pipeline& pipe,
-        std::chrono::time_point<std::chrono::high_resolution_clock>& t_now,
-        std::chrono::time_point<std::chrono::high_resolution_clock>& t_past)
+    std::string serial;
+    rs2::pipeline pipe;
+    rs2::config cfg;
+    std::shared_ptr<rs2::frameset> frames;
+    std::chrono::time_point<std::chrono::high_resolution_clock> t_now, t_past;
+    std::mutex mtx;
+
+    void frames_update()
     {
-        while(!mtx.try_lock());
         mtx.lock();
         frames = std::make_shared<rs2::frameset>(pipe.wait_for_frames());
+        color = frames->get_color_frame();
+        if (!color)
+            color = frames->get_infrared_frame();
+        pc.map_to(color);
+        rs2::depth_frame depth = frames->get_depth_frame();
+        points = pc.calculate(depth);
         mtx.unlock();
 
         t_now = std::chrono::high_resolution_clock::now();
@@ -83,27 +90,14 @@ namespace EMIRO
             depth_sensor.set_option(RS2_OPTION_LASER_POWER, 0.f); // Disable laser
         }
         std::cout << "D455 Camera is ON\n";
-        th = std::thread(
-            frames_update,
-            std::ref(mtx),
-            std::ref(frames),
-            std::ref(pipe),
-            std::ref(t_now),
-            std::ref(t_past));
+        th = std::thread(frames_update);
         th.detach();
     }
 
-    void Device::get_pc(rs2::points& points, rs2::video_frame& color, int loop)
+    void Device::get_pc(rs2::points& p, rs2::video_frame& c, int loop)
     {
-        while(!mtx.try_lock());
-        mtx.lock();
-        color = frames->get_color_frame();
-        if (!color)
-            color = frames->get_infrared_frame();
-        pc.map_to(color);
-        auto depth = frames->get_depth_frame();
-        mtx.unlock();
-        points = pc.calculate(depth);
+        p = points;
+        c = color;
     }
 
     void Device::check_dir(std::string folder)
