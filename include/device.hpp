@@ -22,13 +22,15 @@
 
 namespace EMIRO
 {
+	extern std::mutex mtx;
+
 	void frames_update(
-        std::mutex* mtx,
-        rs2::pipeline& pipe,
-        rs2::pointcloud& pc,
-        rs2::points& point,
-        rs2::video_frame& color,
-        rs2::depth_frame& depth);
+        rs2::pipeline pipe,
+        rs2::pointcloud pc,
+        rs2::points point,
+        rs2::video_frame color,
+        std::chrono::time_point<std::chrono::high_resolution_clock> t_now,
+        std::chrono::time_point<std::chrono::high_resolution_clock> t_past);
 
 	struct RGB{
 		float r, g, b;
@@ -45,11 +47,12 @@ namespace EMIRO
 	    rs2::config cfg;
 	    rs2::pointcloud pc;
 	    rs2::points point;
-    	rs2::video_frame color;
-
     	std::chrono::time_point<std::chrono::high_resolution_clock> t_now, t_past;
     	std::mutex mtx;
 		std::string out_folder, pc_folder;
+
+		rs2::frame f;
+		rs2::video_frame color;
 
 		int filename_idx = 1;
 

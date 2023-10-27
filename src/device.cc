@@ -3,20 +3,22 @@
 
 namespace EMIRO
 {
+    std::mutex mtx;
+
     void frames_update(
-        std::mutex* mtx,
-        rs2::pipeline& pipe,
-        rs2::pointcloud& pc,
-        rs2::points& point,
-        rs2::video_frame& color,
-        rs2::depth_frame& depth)
+        rs2::pipeline pipe,
+        rs2::pointcloud pc,
+        rs2::points point,
+        rs2::video_frame color,
+        std::chrono::time_point<std::chrono::high_resolution_clock> t_now,
+        std::chrono::time_point<std::chrono::high_resolution_clock> t_past)
     {
         rs2::frameset frames = pipe.wait_for_frames();
         color = frames.get_color_frame();
         if (!color)
             color = frames.get_infrared_frame();
         pc.map_to(color);
-        depth = frames.get_depth_frame();
+        rs2::depth_frame depth = frames.get_depth_frame();
         point = pc.calculate(depth);
 
         t_now = std::chrono::high_resolution_clock::now();
@@ -61,9 +63,11 @@ namespace EMIRO
         t_past = std::chrono::high_resolution_clock::now();
         check_dir();
 
+        cfg.enable_stream(RS2_STREAM_DEPTH, 0, 848, 480, RS2_FORMAT_Z16, 30);
+
     	cfg.enable_stream(RS2_STREAM_COLOR);
-        cfg.enable_stream(RS2_STREAM_INFRARED);
-        cfg.enable_stream(RS2_STREAM_DEPTH);
+        // cfg.enable_stream(RS2_STREAM_INFRARED);
+        // cfg.enable_stream(RS2_STREAM_DEPTH);
 
         rs2::pipeline_profile selection = pipe.start(cfg);
 
@@ -87,7 +91,11 @@ namespace EMIRO
             depth_sensor.set_option(RS2_OPTION_LASER_POWER, 0.f); // Disable laser
         }
         std::cout << "D455 Camera is ON\n";
-        th = std::thread(frames_update, &mtx, pipe, pc, point, color, &depth);
+
+        // Take first
+        rs2::frameset frames = pipe.wait_for_frames();
+        color = frames.get_color_frame();;
+        th = std::thread(frames_update, pipe, pc, point, color, t_now, t_past);
         th.detach();
     }
 
