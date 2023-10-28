@@ -28,7 +28,7 @@ namespace EMIRO
             data->lock.clear(std::memory_order_release);
 
             data->t_now = std::chrono::high_resolution_clock::now();
-            std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>((*data).t_now - ((*data).t_past));
+            std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(data->t_now - data->t_past);
             data->t_past = data->t_now;
             float _fps = 1000000 / (float)duration.count();
 
@@ -234,7 +234,7 @@ namespace EMIRO
         }
     }
 
-    void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, std::string file_name)
+    void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Position pos, std::string file_name)
     {
         std::string formatted_name = file_name + std::to_string(filename_idx) + ".pcd";
 
@@ -248,6 +248,9 @@ namespace EMIRO
 
         root["filename"] = formatted_name.c_str();
         root["time"] = buffer;
+        root["x"] = pos.x;
+        root["y"] = pos.y;
+        root["z"] = pos.z;
         if(filename_idx > 1)
             output_file << ",\n";
         writer->write(root, &output_file);
