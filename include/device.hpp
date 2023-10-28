@@ -47,14 +47,14 @@ public:
     rs2::pointcloud pc;
     rs2::points point;
     rs2::frame color;
+    rs2::frameset frames;
     res_time t_now;
     res_time t_past;
 
     D455Data() :
         thread_en(true),  // Initialize boolean member
         status(TStatus::None),  // Initialize 'status' with TStatus::None
-        lock(ATOMIC_FLAG_INIT),
-       	color(f)  // Initialize 'color' with 'f'
+        lock(ATOMIC_FLAG_INIT)
     {
     }
 };

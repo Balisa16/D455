@@ -8,20 +8,20 @@ namespace EMIRO
         data->status = TStatus::Init;
         std::thread::id th_id = std::this_thread::get_id();
         std::cout << "Thread Detach in " << th_id << '\n';
-        float maks_fps = 10.0f;
+        float maks_fps = 40.0f;
         std::cout << std::fixed << std::setprecision(2);
 
         while(data->thread_en)
         {
             while (data->lock.test_and_set(std::memory_order_acquire));
 
-            rs2::frameset frames = data->pipe.wait_for_frames();
-            data->color = frames.get_color_frame();
+            data->frames = data->pipe.wait_for_frames();
+            /*data->color = frames.get_color_frame();
             if (!data->color)
                 data->color = frames.get_infrared_frame();
             data->pc.map_to(data->color);
             rs2::depth_frame depth = frames.get_depth_frame();
-            data->point = data->pc.calculate(depth);
+            data->point = data->pc.calculate(depth);*/
             data->status = TStatus::Available;
             
             // Release the lock
@@ -53,6 +53,7 @@ namespace EMIRO
             std::cout << ' ' << _fps << '/' << maks_fps << "\033[0m]     \r";
             std::cout.flush();
         }
+        std::cout << "Thread Finished" << std::string(45, ' ') << '\n';
         data->status = TStatus::Exit;
     }
 
@@ -118,12 +119,18 @@ namespace EMIRO
         // Take first
         th = std::thread(frames_update, &data);
         th.detach();
-        while(data->status != TStatus::Available);
+        while(data.status != TStatus::Available);
     }
 
     void Device::get_pc(rs2::points& p, rs2::video_frame& c)
     {
         while (data.lock.test_and_set(std::memory_order_acquire));
+        data.color = data.frames.get_color_frame();
+        if (!data.color)
+            data.color = data.frames.get_infrared_frame();
+        data.pc.map_to(data.color);
+        rs2::depth_frame depth = data.frames.get_depth_frame();
+        data.point = data.pc.calculate(depth);
         p = data.point;
         c = data.color;
         data.lock.clear(std::memory_order_release);
@@ -244,16 +251,19 @@ namespace EMIRO
         filename_idx++;
 
     	int ret = pcl::io::savePCDFile((pc_folder + formatted_name).c_str(), pc);
+        
+
         if(ret == 0)
-            std::cout << "\033[32mSaved " << formatted_name << "\033[0m" << std::endl;
+            std::cout << "\033[32mSaved " << formatted_name << "\033[0m";
         else
             std::cout << "\033[31mPCD Export FAILED\033[0m. Status : " << ret << '\n';
+        std::cout << std::string(30, ' ') << '\n';
     }
 
     Device::~Device()
     {
         data.thread_en = false;
-        while(data->status != TStatus::Exit);
+        while(data.status != TStatus::Exit);
         output_file.close();
     }
 }
