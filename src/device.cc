@@ -221,7 +221,7 @@ namespace EMIRO
         {
             if(Vertex[i].x > 5.0f || 
                 Vertex[i].y > 5.0f ||
-                Vertex[i].x > 5.0f) continue;
+                Vertex[i].z > 5.0f) continue;
             output.points[i].z = Vertex[i].x;
             output.points[i].y = Vertex[i].y;
             output.points[i].x = Vertex[i].z < depth_lim ? Vertex[i].z : depth_lim;
