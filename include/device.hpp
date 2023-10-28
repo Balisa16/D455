@@ -62,6 +62,7 @@ namespace EMIRO
 
 		void check_dir(std::string folder = "../output");
 		void RGB_Texture(rs2::video_frame& texture, rs2::texture_coordinate Texture_XY, RGB& out_RGB);
+		void progress_bar(int i, int maks = 100);
 
 		// JSON Writer
 		Json::Value root;

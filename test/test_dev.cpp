@@ -9,7 +9,6 @@ int main()
 	rs2::points pc;
 	rs2::frame f;
 	rs2::video_frame frame(f);
-	std::cout << "Sander \n";
 
 	pcl::PointCloud<pcl::PointXYZRGB> pcl_pc;
 

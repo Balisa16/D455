@@ -15,7 +15,10 @@ namespace EMIRO
         std::chrono::time_point<std::chrono::high_resolution_clock>* t_past)
     {
         std::thread::id th_id = std::this_thread::get_id();
-        printf("Address TH : %p\n", point);
+        printf("Thread ID : %p\n", point);
+
+        float maks_fps = 10.0f;
+        std::cout << std::fixed << std::setprecision(2);
         while(true)
         {
             while (lock.test_and_set(std::memory_order_acquire));
@@ -34,38 +37,53 @@ namespace EMIRO
             *t_now = std::chrono::high_resolution_clock::now();
             std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(*t_now - (*t_past));
             *t_past = *t_now;
-            float _fps = 1000000 / duration.count();
-            printf("FPS : %.2f  \n", _fps);
-        }
+            float _fps = 1000000 / (float)duration.count();
 
-        /*
-        for(int i = 0; i <= loop; i++)
-        {
-            std::cout << "Frame : [";
+            if(_fps > maks_fps) _fps = maks_fps;
+
+            std::cout << "\033[1mFPS : [";
 
             // Bar color
-            if((i/(float)loop) < 0.3f)
+            if((_fps/(float)maks_fps) < 0.3f)
                 std::cout << "\033[31m";
-            else if((i/(float)loop) > 0.7f)
+            else if((_fps/(float)maks_fps) > 0.7f)
                 std::cout << "\033[32m";
             else
                 std::cout << "\033[33m";
 
-            float _div = loop/30.0f;
-            for(int j = 0; j <= i; j += _div)
+            float _div = maks_fps/30.0f;
+            for(int j = 0; j <= _fps; j += _div)
                 std::cout << "▇";
-            for(int j = i+1; j <= loop; j += _div)
+            for(int j = _fps+1; j <= maks_fps; j += _div)
                 std::cout << " ";
 
-            std::cout << "\033[0m] " << (int)(i*100/loop);
-            if(i < loop)
-                std::cout << "%  \r";
-            else
-                std::cout << "% \033[32m[OK]\033[0m\n";
+            std::cout << ' ' << _fps << '/' << maks_fps << "\033[0m]     \r";
             std::cout.flush();
         }
-        */
     }
+
+    void Device::progress_bar(int i, int maks)
+    {
+        if((i/(float)maks) < 0.3f)
+            std::cout << "\033[31m";
+        else if((i/(float)maks) > 0.7f)
+            std::cout << "\033[32m";
+        else
+            std::cout << "\033[33m";
+
+        float _div = maks/30.0f;
+        for(int j = 0; j <= i; j += _div)
+            std::cout << "▇";
+        for(int j = i+1; j <= maks; j += _div)
+            std::cout << " ";
+
+        std::cout << "\033[0m] " << (int)(i*100/maks);
+        if(i < maks)
+            std::cout << "%  \r";
+        else
+            std::cout << "% \033[32m[OK]\033[0m\n";
+        std::cout.flush();
+}
 
     Device::Device() : 
         builder(),
@@ -106,9 +124,7 @@ namespace EMIRO
 
         // Take first
         rs2::frameset frames = pipe.wait_for_frames();
-        color = frames.get_color_frame();;
-        
-        printf("Address F : %p\n", &point);
+        color = frames.get_color_frame();
         th = std::thread(frames_update, &pipe, &pc, &point, &color, &t_now, &t_past);
         th.detach();
         std::cout << "Thread is detach\n";
@@ -117,11 +133,8 @@ namespace EMIRO
     void Device::get_pc(rs2::points& p, rs2::video_frame& c)
     {
         while (lock.test_and_set(std::memory_order_acquire));
-        std::cout << "Get PC\n";
         p = point;
         c = color;
-        std::cout << "Get PC 2\n";
-
         lock.clear(std::memory_order_release);
     }
 
