@@ -7,36 +7,36 @@ namespace EMIRO
     std::mutex mtx;
 
     void frames_update(
-        rs2::pipeline pipe,
-        rs2::pointcloud pc,
-        rs2::points point,
-        rs2::video_frame color,
-        std::chrono::time_point<std::chrono::high_resolution_clock> t_now,
-        std::chrono::time_point<std::chrono::high_resolution_clock> t_past)
+        rs2::pipeline* pipe,
+        rs2::pointcloud* pc,
+        rs2::points* point,
+        rs2::video_frame* color,
+        std::chrono::time_point<std::chrono::high_resolution_clock>* t_now,
+        std::chrono::time_point<std::chrono::high_resolution_clock>* t_past)
     {
-
         std::thread::id th_id = std::this_thread::get_id();
-        while (lock.test_and_set(std::memory_order_acquire)) {
-            std::cout << ".";
-            std::cout.flush();
+        printf("Address TH : %p\n", point);
+        while(true)
+        {
+            while (lock.test_and_set(std::memory_order_acquire));
+
+            rs2::frameset frames = pipe->wait_for_frames();
+            *color = frames.get_color_frame();
+            if (!(*color))
+                *color = frames.get_infrared_frame();
+            pc->map_to(*color);
+            rs2::depth_frame depth = frames.get_depth_frame();
+            *point = pc->calculate(depth);
+            
+            // Release the lock
+            lock.clear(std::memory_order_release);
+
+            *t_now = std::chrono::high_resolution_clock::now();
+            std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(*t_now - (*t_past));
+            *t_past = *t_now;
+            float _fps = 1000000 / duration.count();
+            printf("FPS : %.2f  \n", _fps);
         }
-
-        rs2::frameset frames = pipe.wait_for_frames();
-        printf("Address TH : %p", &point);
-        color = frames.get_color_frame();
-        if (!color)
-            color = frames.get_infrared_frame();
-        pc.map_to(color);
-        rs2::depth_frame depth = frames.get_depth_frame();
-        point = pc.calculate(depth);
-        
-        // Release the lock
-        lock.clear(std::memory_order_release);
-
-        t_now = std::chrono::high_resolution_clock::now();
-        std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(t_now - t_past);
-        t_past = t_now;
-        float _fps = 1000000 / duration.count();
 
         /*
         for(int i = 0; i <= loop; i++)
@@ -65,7 +65,6 @@ namespace EMIRO
             std::cout.flush();
         }
         */
-        printf("FPS : %.2f  \r", _fps);
     }
 
     Device::Device() : 
@@ -109,20 +108,19 @@ namespace EMIRO
         rs2::frameset frames = pipe.wait_for_frames();
         color = frames.get_color_frame();;
         
-        printf("Address F : %p", &point);
-        th = std::thread(frames_update, pipe, pc, point, color, t_now, t_past);
+        printf("Address F : %p\n", &point);
+        th = std::thread(frames_update, &pipe, &pc, &point, &color, &t_now, &t_past);
         th.detach();
         std::cout << "Thread is detach\n";
     }
 
-    void Device::get_pc(rs2::points& p, rs2::video_frame& c, int loop)
+    void Device::get_pc(rs2::points& p, rs2::video_frame& c)
     {
-        while (lock.test_and_set(std::memory_order_acquire)) {
-            std::cout << "-";
-            std::cout.flush();
-        }
+        while (lock.test_and_set(std::memory_order_acquire));
+        std::cout << "Get PC\n";
         p = point;
         c = color;
+        std::cout << "Get PC 2\n";
 
         lock.clear(std::memory_order_release);
     }

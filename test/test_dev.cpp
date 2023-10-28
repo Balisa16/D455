@@ -5,19 +5,23 @@
 int main()
 {
 	EMIRO::Device dev;
-	int counter = 5;
+	int counter = 15;
 	rs2::points pc;
 	rs2::frame f;
 	rs2::video_frame frame(f);
-	dev.get_pc(pc, frame, 200);
+	std::cout << "Sander \n";
 
 	pcl::PointCloud<pcl::PointXYZRGB> pcl_pc;
 
 	std::cout << std::fixed << std::setprecision(2);
 	std::chrono::time_point<std::chrono::high_resolution_clock> t_now, t_past = std::chrono::high_resolution_clock::now();
+	
+	std::chrono::seconds du(1);
+	std::this_thread::sleep_for(du);
+	
 	while(counter)
 	{
-		dev.get_pc(pc, frame, 100);
+		dev.get_pc(pc, frame);
 		auto vert = pc.get_vertices();
 
 		dev.convert_to_PCL(pc, frame, pcl_pc, 3.0f);

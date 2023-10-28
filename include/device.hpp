@@ -29,12 +29,12 @@ namespace EMIRO
 	extern std::mutex mtx;
 
 	void frames_update(
-        rs2::pipeline pipe,
-        rs2::pointcloud pc,
-        rs2::points point,
-        rs2::video_frame color,
-        std::chrono::time_point<std::chrono::high_resolution_clock> t_now,
-        std::chrono::time_point<std::chrono::high_resolution_clock> t_past);
+        rs2::pipeline* pipe,
+        rs2::pointcloud* pc,
+        rs2::points* point,
+        rs2::video_frame* color,
+        std::chrono::time_point<std::chrono::high_resolution_clock>* t_now,
+        std::chrono::time_point<std::chrono::high_resolution_clock>* t_past);
 
 	struct RGB{
 		float r, g, b;
@@ -75,7 +75,7 @@ namespace EMIRO
 	public:
 
 		Device();
-		void get_pc(rs2::points& p, rs2::video_frame& c, int loop = 10);
+		void get_pc(rs2::points& p, rs2::video_frame& c);
 		void convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output, float depth_lim = 5.0f);
 		void savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, std::string file_name = "pointcloud");
 		~Device();
