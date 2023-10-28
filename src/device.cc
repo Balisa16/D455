@@ -5,10 +5,12 @@ namespace EMIRO
 {
     void frames_update(D455Data* data)
     {
+        data->status = TStatus::Init;
         std::thread::id th_id = std::this_thread::get_id();
         std::cout << "Thread Detach in " << th_id << '\n';
         float maks_fps = 10.0f;
         std::cout << std::fixed << std::setprecision(2);
+
         while(data->thread_en)
         {
             while (data->lock.test_and_set(std::memory_order_acquire));
@@ -20,6 +22,7 @@ namespace EMIRO
             data->pc.map_to(data->color);
             rs2::depth_frame depth = frames.get_depth_frame();
             data->point = data->pc.calculate(depth);
+            data->status = TStatus::Available;
             
             // Release the lock
             data->lock.clear(std::memory_order_release);
@@ -50,6 +53,7 @@ namespace EMIRO
             std::cout << ' ' << _fps << '/' << maks_fps << "\033[0m]     \r";
             std::cout.flush();
         }
+        data->status = TStatus::Exit;
     }
 
     void Device::progress_bar(int i, int maks)
@@ -114,6 +118,7 @@ namespace EMIRO
         // Take first
         th = std::thread(frames_update, &data);
         th.detach();
+        while(data->status != TStatus::Available);
     }
 
     void Device::get_pc(rs2::points& p, rs2::video_frame& c)
@@ -247,9 +252,8 @@ namespace EMIRO
 
     Device::~Device()
     {
-        output_file.close();
         data.thread_en = false;
-        std::chrono::milliseconds ms(200);
-        std::this_thread::sleep_for(ms);
+        while(data->status != TStatus::Exit);
+        output_file.close();
     }
 }

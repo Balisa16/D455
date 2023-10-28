@@ -14,9 +14,6 @@ int main()
 
 	std::cout << std::fixed << std::setprecision(2);
 	std::chrono::time_point<std::chrono::high_resolution_clock> t_now, t_past = std::chrono::high_resolution_clock::now();
-	
-	std::chrono::milliseconds ms(1000);
-    std::this_thread::sleep_for(ms);
 
 	while(counter)
 	{

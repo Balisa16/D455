@@ -51,7 +51,7 @@ public:
     res_time t_past;
 
     D455Data() :
-        thread_en(false),  // Initialize boolean member
+        thread_en(true),  // Initialize boolean member
         status(TStatus::None),  // Initialize 'status' with TStatus::None
         lock(ATOMIC_FLAG_INIT),
        	color(f)  // Initialize 'color' with 'f'
@@ -76,9 +76,6 @@ namespace EMIRO
 	    D455Data data;
 
 		std::string out_folder, pc_folder;
-
-		bool thread_en = true;
-		TStatus thread_status = TStatus::Init;
 
 		int filename_idx = 1;
 
