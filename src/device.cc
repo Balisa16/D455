@@ -3,40 +3,29 @@
 
 namespace EMIRO
 {
-    std::atomic_flag lock = ATOMIC_FLAG_INIT;
-    std::mutex mtx;
-
-    void frames_update(
-        rs2::pipeline* pipe,
-        rs2::pointcloud* pc,
-        rs2::points* point,
-        rs2::video_frame* color,
-        std::chrono::time_point<std::chrono::high_resolution_clock>* t_now,
-        std::chrono::time_point<std::chrono::high_resolution_clock>* t_past)
+    void frames_update(std::shared_ptr<D455Data> data)
     {
         std::thread::id th_id = std::this_thread::get_id();
-        printf("Thread ID : %p\n", point);
-
         float maks_fps = 10.0f;
         std::cout << std::fixed << std::setprecision(2);
-        while(true)
+        while(data->thread_en)
         {
-            while (lock.test_and_set(std::memory_order_acquire));
+            while (data->lock.test_and_set(std::memory_order_acquire));
 
-            rs2::frameset frames = pipe->wait_for_frames();
-            *color = frames.get_color_frame();
-            if (!(*color))
-                *color = frames.get_infrared_frame();
-            pc->map_to(*color);
+            rs2::frameset frames = data->pipe.wait_for_frames();
+            data->color = frames.get_color_frame();
+            if (!data->color)
+                data->color = frames.get_infrared_frame();
+            data->pc.map_to(data->color);
             rs2::depth_frame depth = frames.get_depth_frame();
-            *point = pc->calculate(depth);
+            data->point = data->pc.calculate(depth);
             
             // Release the lock
-            lock.clear(std::memory_order_release);
+            data->lock.clear(std::memory_order_release);
 
-            *t_now = std::chrono::high_resolution_clock::now();
-            std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(*t_now - (*t_past));
-            *t_past = *t_now;
+            data->t_now = std::chrono::high_resolution_clock::now();
+            std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(data->t_now - (data->t_past));
+            data->t_past = data->t_now;
             float _fps = 1000000 / (float)duration.count();
 
             if(_fps > maks_fps) _fps = maks_fps;
@@ -52,9 +41,9 @@ namespace EMIRO
                 std::cout << "\033[33m";
 
             float _div = maks_fps/30.0f;
-            for(int j = 0; j <= _fps; j += _div)
+            for(float j = 0.f; j <= _fps; j += _div)
                 std::cout << "▇";
-            for(int j = _fps+1; j <= maks_fps; j += _div)
+            for(float j = _fps+.001f; j <= maks_fps; j += _div)
                 std::cout << " ";
 
             std::cout << ' ' << _fps << '/' << maks_fps << "\033[0m]     \r";
@@ -87,19 +76,18 @@ namespace EMIRO
 
     Device::Device() : 
         builder(),
-        writer(builder.newStreamWriter()),
-        color(f)
+        writer(builder.newStreamWriter())
     {
-        t_past = std::chrono::high_resolution_clock::now();
+        data->t_past = std::chrono::high_resolution_clock::now();
         check_dir();
 
-        cfg.enable_stream(RS2_STREAM_DEPTH, 0, 848, 480, RS2_FORMAT_Z16, 30);
+        data->cfg.enable_stream(RS2_STREAM_DEPTH, 0, 848, 480, RS2_FORMAT_Z16, 30);
 
-    	cfg.enable_stream(RS2_STREAM_COLOR);
+    	data->cfg.enable_stream(RS2_STREAM_COLOR);
         // cfg.enable_stream(RS2_STREAM_INFRARED);
         // cfg.enable_stream(RS2_STREAM_DEPTH);
 
-        rs2::pipeline_profile selection = pipe.start(cfg);
+        rs2::pipeline_profile selection = data->pipe.start(data->cfg);
 
         rs2::device selected_device = selection.get_device();
 
@@ -108,7 +96,7 @@ namespace EMIRO
         if (depth_sensor.supports(RS2_OPTION_EMITTER_ENABLED))
         {
             depth_sensor.set_option(RS2_OPTION_EMITTER_ENABLED, 1.f); // Enable emitter
-            pipe.wait_for_frames();
+            data->pipe.wait_for_frames();
             depth_sensor.set_option(RS2_OPTION_EMITTER_ENABLED, 0.f); // Disable emitter
         }
 
@@ -123,19 +111,17 @@ namespace EMIRO
         std::cout << "D455 Camera is ON\n";
 
         // Take first
-        rs2::frameset frames = pipe.wait_for_frames();
-        color = frames.get_color_frame();
-        th = std::thread(frames_update, &pipe, &pc, &point, &color, &t_now, &t_past);
+        th = std::thread(frames_update, data);
         th.detach();
         std::cout << "Thread is detach\n";
     }
 
     void Device::get_pc(rs2::points& p, rs2::video_frame& c)
     {
-        while (lock.test_and_set(std::memory_order_acquire));
-        p = point;
-        c = color;
-        lock.clear(std::memory_order_release);
+        while (data->lock.test_and_set(std::memory_order_acquire));
+        p = data->point;
+        c = data->color;
+        data->lock.clear(std::memory_order_release);
     }
 
     void Device::check_dir(std::string folder)
@@ -254,7 +240,7 @@ namespace EMIRO
 
     	int ret = pcl::io::savePCDFile((pc_folder + formatted_name).c_str(), pc);
         if(ret == 0)
-            std::cout << "\033[32mSaved " << formatted_name << "\033[0m\n";
+            std::cout << "\033[32mSaved " << formatted_name << "\033[0m" << std::endl;
         else
             std::cout << "\033[31mPCD Export FAILED\033[0m. Status : " << ret << '\n';
     }
@@ -262,5 +248,8 @@ namespace EMIRO
     Device::~Device()
     {
         output_file.close();
+        data->thread_en = false;
+        std::chrono::milliseconds ms(200);
+        std::this_thread::sleep_for(ms);
     }
 }

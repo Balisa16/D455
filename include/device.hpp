@@ -22,19 +22,46 @@
 
 #include <atomic>
 
-extern std::atomic_flag lock;
+typedef std::chrono::time_point<std::chrono::high_resolution_clock> res_time;
+
+enum class TStatus{
+	None,
+	Init,
+	Available,
+	Exit
+};
+
+struct D455Data
+{
+private:
+    const rs2::frame f;
+	
+public:
+    bool thread_en;
+    TStatus status;
+    std::atomic_flag lock;
+
+    std::string serial;
+    rs2::config cfg;
+    rs2::pipeline pipe;
+    rs2::pointcloud pc;
+    rs2::points point;
+    rs2::frame color;
+    res_time t_now;
+    res_time t_past;
+
+    D455Data() :
+        thread_en(false),  // Initialize boolean member
+        status(TStatus::None),  // Initialize 'status' with TStatus::None
+        lock(ATOMIC_FLAG_INIT),
+       	color(f)  // Initialize 'color' with 'f'
+    {
+    }
+};
 
 namespace EMIRO
 {
-	extern std::mutex mtx;
-
-	void frames_update(
-        rs2::pipeline* pipe,
-        rs2::pointcloud* pc,
-        rs2::points* point,
-        rs2::video_frame* color,
-        std::chrono::time_point<std::chrono::high_resolution_clock>* t_now,
-        std::chrono::time_point<std::chrono::high_resolution_clock>* t_past);
+	void frames_update(std::shared_ptr<D455Data> data);
 
 	struct RGB{
 		float r, g, b;
@@ -46,17 +73,12 @@ namespace EMIRO
 	class Device
 	{
 	private:
-		std::string serial;
-	    rs2::pipeline pipe;
-	    rs2::config cfg;
-	    rs2::pointcloud pc;
-	    rs2::points point;
-    	std::chrono::time_point<std::chrono::high_resolution_clock> t_now, t_past;
-    	std::mutex mtx;
+	    std::shared_ptr<D455Data> data = std::make_shared<D455Data>();
+
 		std::string out_folder, pc_folder;
 
-		const rs2::frame f;
-		rs2::video_frame color;
+		bool thread_en = true;
+		TStatus thread_status = TStatus::Init;
 
 		int filename_idx = 1;
 
