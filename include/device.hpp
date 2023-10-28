@@ -35,7 +35,7 @@ struct D455Data
 {
 private:
     const rs2::frame f;
-	
+
 public:
     bool thread_en;
     TStatus status;
@@ -61,7 +61,7 @@ public:
 
 namespace EMIRO
 {
-	void frames_update(std::shared_ptr<D455Data> data);
+	void frames_update(D455Data* data);
 
 	struct RGB{
 		float r, g, b;
@@ -73,7 +73,7 @@ namespace EMIRO
 	class Device
 	{
 	private:
-	    std::shared_ptr<D455Data> data = std::make_shared<D455Data>();
+	    D455Data data;
 
 		std::string out_folder, pc_folder;
 

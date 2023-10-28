@@ -3,9 +3,10 @@
 
 namespace EMIRO
 {
-    void frames_update(std::shared_ptr<D455Data> data)
+    void frames_update(D455Data* data)
     {
         std::thread::id th_id = std::this_thread::get_id();
+        std::cout << "Thread Detach in " << th_id << '\n';
         float maks_fps = 10.0f;
         std::cout << std::fixed << std::setprecision(2);
         while(data->thread_en)
@@ -24,7 +25,7 @@ namespace EMIRO
             data->lock.clear(std::memory_order_release);
 
             data->t_now = std::chrono::high_resolution_clock::now();
-            std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(data->t_now - (data->t_past));
+            std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>((*data).t_now - ((*data).t_past));
             data->t_past = data->t_now;
             float _fps = 1000000 / (float)duration.count();
 
@@ -78,16 +79,16 @@ namespace EMIRO
         builder(),
         writer(builder.newStreamWriter())
     {
-        data->t_past = std::chrono::high_resolution_clock::now();
+        data.t_past = std::chrono::high_resolution_clock::now();
         check_dir();
 
-        data->cfg.enable_stream(RS2_STREAM_DEPTH, 0, 848, 480, RS2_FORMAT_Z16, 30);
+        data.cfg.enable_stream(RS2_STREAM_DEPTH, 0, 848, 480, RS2_FORMAT_Z16, 30);
 
-    	data->cfg.enable_stream(RS2_STREAM_COLOR);
+    	data.cfg.enable_stream(RS2_STREAM_COLOR);
         // cfg.enable_stream(RS2_STREAM_INFRARED);
         // cfg.enable_stream(RS2_STREAM_DEPTH);
 
-        rs2::pipeline_profile selection = data->pipe.start(data->cfg);
+        rs2::pipeline_profile selection = data.pipe.start(data.cfg);
 
         rs2::device selected_device = selection.get_device();
 
@@ -96,7 +97,7 @@ namespace EMIRO
         if (depth_sensor.supports(RS2_OPTION_EMITTER_ENABLED))
         {
             depth_sensor.set_option(RS2_OPTION_EMITTER_ENABLED, 1.f); // Enable emitter
-            data->pipe.wait_for_frames();
+            data.pipe.wait_for_frames();
             depth_sensor.set_option(RS2_OPTION_EMITTER_ENABLED, 0.f); // Disable emitter
         }
 
@@ -111,17 +112,16 @@ namespace EMIRO
         std::cout << "D455 Camera is ON\n";
 
         // Take first
-        th = std::thread(frames_update, data);
+        th = std::thread(frames_update, &data);
         th.detach();
-        std::cout << "Thread is detach\n";
     }
 
     void Device::get_pc(rs2::points& p, rs2::video_frame& c)
     {
-        while (data->lock.test_and_set(std::memory_order_acquire));
-        p = data->point;
-        c = data->color;
-        data->lock.clear(std::memory_order_release);
+        while (data.lock.test_and_set(std::memory_order_acquire));
+        p = data.point;
+        c = data.color;
+        data.lock.clear(std::memory_order_release);
     }
 
     void Device::check_dir(std::string folder)
@@ -248,7 +248,7 @@ namespace EMIRO
     Device::~Device()
     {
         output_file.close();
-        data->thread_en = false;
+        data.thread_en = false;
         std::chrono::milliseconds ms(200);
         std::this_thread::sleep_for(ms);
     }
