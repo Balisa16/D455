@@ -3,6 +3,7 @@
 
 namespace EMIRO
 {
+    std::atomic_flag lock = ATOMIC_FLAG_INIT;
     std::mutex mtx;
 
     void frames_update(
@@ -13,13 +14,24 @@ namespace EMIRO
         std::chrono::time_point<std::chrono::high_resolution_clock> t_now,
         std::chrono::time_point<std::chrono::high_resolution_clock> t_past)
     {
+
+        std::thread::id th_id = std::this_thread::get_id();
+        while (lock.test_and_set(std::memory_order_acquire)) {
+            std::cout << ".";
+            std::cout.flush();
+        }
+
         rs2::frameset frames = pipe.wait_for_frames();
+        printf("Address TH : %p", &point);
         color = frames.get_color_frame();
         if (!color)
             color = frames.get_infrared_frame();
         pc.map_to(color);
         rs2::depth_frame depth = frames.get_depth_frame();
         point = pc.calculate(depth);
+        
+        // Release the lock
+        lock.clear(std::memory_order_release);
 
         t_now = std::chrono::high_resolution_clock::now();
         std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(t_now - t_past);
@@ -58,7 +70,8 @@ namespace EMIRO
 
     Device::Device() : 
         builder(),
-        writer(builder.newStreamWriter())
+        writer(builder.newStreamWriter()),
+        color(f)
     {
         t_past = std::chrono::high_resolution_clock::now();
         check_dir();
@@ -95,14 +108,23 @@ namespace EMIRO
         // Take first
         rs2::frameset frames = pipe.wait_for_frames();
         color = frames.get_color_frame();;
+        
+        printf("Address F : %p", &point);
         th = std::thread(frames_update, pipe, pc, point, color, t_now, t_past);
         th.detach();
+        std::cout << "Thread is detach\n";
     }
 
     void Device::get_pc(rs2::points& p, rs2::video_frame& c, int loop)
     {
+        while (lock.test_and_set(std::memory_order_acquire)) {
+            std::cout << "-";
+            std::cout.flush();
+        }
         p = point;
         c = color;
+
+        lock.clear(std::memory_order_release);
     }
 
     void Device::check_dir(std::string folder)

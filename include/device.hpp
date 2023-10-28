@@ -20,6 +20,10 @@
 #include <mutex>
 #include <functional>
 
+#include <atomic>
+
+extern std::atomic_flag lock;
+
 namespace EMIRO
 {
 	extern std::mutex mtx;
@@ -51,7 +55,7 @@ namespace EMIRO
     	std::mutex mtx;
 		std::string out_folder, pc_folder;
 
-		rs2::frame f;
+		const rs2::frame f;
 		rs2::video_frame color;
 
 		int filename_idx = 1;

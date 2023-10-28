@@ -8,14 +8,13 @@ int main()
 	int counter = 5;
 	rs2::points pc;
 	rs2::frame f;
-	rs2::video_frame frame;
+	rs2::video_frame frame(f);
 	dev.get_pc(pc, frame, 200);
 
 	pcl::PointCloud<pcl::PointXYZRGB> pcl_pc;
 
 	std::cout << std::fixed << std::setprecision(2);
 	std::chrono::time_point<std::chrono::high_resolution_clock> t_now, t_past = std::chrono::high_resolution_clock::now();
-	std::cout << "Test 5\n";
 	while(counter)
 	{
 		dev.get_pc(pc, frame, 100);
