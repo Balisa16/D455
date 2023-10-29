@@ -207,11 +207,16 @@ namespace EMIRO
     void Device::convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output, float depth_lim)
     {
         auto sp = in_points.get_profile().as<rs2::video_stream_profile>();
+
+        Eigen::Vector4f origin(2.0f, 0.0f, 1.0f, -3.0f);
+        Eigen::Quaternionf quat(2.0f, 0.0f, 1.0f, -3.0f);
         
         output.width  = static_cast<uint32_t>( sp.width()  );   
         output.height = static_cast<uint32_t>( sp.height() );
         output.is_dense = false;
         output.points.resize( in_points.size() );
+        output.sensor_origin_ = origin;
+        output.sensor_orientation_ = quat;
 
         auto Texture_Coord = in_points.get_texture_coordinates();
         auto Vertex = in_points.get_vertices();

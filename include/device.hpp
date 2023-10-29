@@ -1,6 +1,7 @@
 #ifndef DEVICE_HPP
 #define DEVICE_HPP
 
+#include <Eigen/Eigen>
 #include <librealsense2/rs.hpp>
 #include <boost/filesystem.hpp>
 #include <pcl/pcl_exports.h>
@@ -16,9 +17,7 @@
 #include <chrono>
 #include <iomanip> 
 #include <thread>
-#include <mutex>
 #include <functional>
-
 #include <atomic>
 
 
