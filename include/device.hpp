@@ -32,6 +32,10 @@ typedef struct{
 	float x, y, z;
 }Position;
 
+typedef struct{
+	float w, x, y, z;
+}Quaternion;
+
 struct D455Data
 {
 private:
@@ -98,7 +102,7 @@ namespace EMIRO
 		Device();
 		void get_pc(rs2::points& p, rs2::video_frame& c);
 		void convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output, float depth_lim = 5.0f);
-		void savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Position pos = {0.0f, 0.0f, 0.0f}, std::string file_name = "pointcloud");
+		void savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Position pos = {0.0f, 0.0f, 0.0f}, Quaternion quat = {0.0f, 0.0f, 0.0f, 0.0f}, std::string file_name = "pointcloud");
 		~Device();
 		
 	};

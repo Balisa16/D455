@@ -239,7 +239,7 @@ namespace EMIRO
         }
     }
 
-    void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Position pos, std::string file_name)
+    void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Position pos, Quaternion quat, std::string file_name)
     {
         std::string formatted_name = file_name + std::to_string(filename_idx) + ".pcd";
 
@@ -256,6 +256,10 @@ namespace EMIRO
         root["x"] = pos.x;
         root["y"] = pos.y;
         root["z"] = pos.z;
+        root["qw"] = quat.x;
+        root["qx"] = quat.x;
+        root["qy"] = quat.y;
+        root["qz"] = quat.z;
         if(filename_idx > 1)
             output_file << ",\n";
         writer->write(root, &output_file);
