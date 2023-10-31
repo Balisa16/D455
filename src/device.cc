@@ -16,12 +16,6 @@ namespace EMIRO
             while (data->lock.test_and_set(std::memory_order_acquire));
 
             data->frames = data->pipe.wait_for_frames();
-            /*data->color = frames.get_color_frame();
-            if (!data->color)
-                data->color = frames.get_infrared_frame();
-            data->pc.map_to(data->color);
-            rs2::depth_frame depth = frames.get_depth_frame();
-            data->point = data->pc.calculate(depth);*/
             data->status = TStatus::Available;
             
             // Release the lock
