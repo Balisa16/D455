@@ -241,6 +241,10 @@ namespace EMIRO
 
     void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Position pos, Quaternion quat, std::string file_name)
     {
+        // Set sample position and sample quaternion
+        pc.sensor_origin_ = {pos.x, pos.y, pos.z, 1.0f};
+        pc.sensor_orientation_ = quat;
+
         std::string formatted_name = file_name + std::to_string(filename_idx) + ".pcd";
 
         // Get current time
