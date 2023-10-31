@@ -21,7 +21,9 @@ int main()
 		auto vert = pc.get_vertices();
 
 		dev.convert_to_PCL(pc, frame, pcl_pc, 3.0f);
-		dev.savePCD(pcl_pc);
+		Position p = {1.0f, 2.0f, 3.0f};
+		Quaternion q = {0.75f, 0.76f, 0.77f, 0.78f};
+		dev.savePCD(pcl_pc, p, q);
 
 		t_now = std::chrono::high_resolution_clock::now();
 		std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(t_now-t_past);

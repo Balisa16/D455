@@ -201,16 +201,11 @@ namespace EMIRO
     void Device::convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output, float depth_lim)
     {
         auto sp = in_points.get_profile().as<rs2::video_stream_profile>();
-
-        Eigen::Vector4f origin(2.0f, 0.0f, 1.0f, -3.0f);
-        Eigen::Quaternionf quat(2.0f, 0.0f, 1.0f, -3.0f);
         
         output.width  = static_cast<uint32_t>( sp.width()  );   
         output.height = static_cast<uint32_t>( sp.height() );
         output.is_dense = false;
         output.points.resize( in_points.size() );
-        output.sensor_origin_ = origin;
-        output.sensor_orientation_ = quat;
 
         auto Texture_Coord = in_points.get_texture_coordinates();
         auto Vertex = in_points.get_vertices();
@@ -237,7 +232,7 @@ namespace EMIRO
     {
         // Set sample position and sample quaternion
         pc.sensor_origin_ = {pos.x, pos.y, pos.z, 1.0f};
-        pc.sensor_orientation_ = quat;
+        pc.sensor_orientation_ = {quat.w, quat.x, quat.y, quat.z};
 
         std::string formatted_name = file_name + std::to_string(filename_idx) + ".pcd";
 
@@ -254,7 +249,7 @@ namespace EMIRO
         root["x"] = pos.x;
         root["y"] = pos.y;
         root["z"] = pos.z;
-        root["qw"] = quat.x;
+        root["qw"] = quat.w;
         root["qx"] = quat.x;
         root["qy"] = quat.y;
         root["qz"] = quat.z;
