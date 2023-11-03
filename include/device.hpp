@@ -19,22 +19,7 @@
 #include <thread>
 #include <functional>
 #include <atomic>
-
-
-enum class TStatus{
-	None,
-	Init,
-	Available,
-	Exit
-};
-
-typedef struct{
-	float x, y, z;
-}Position;
-
-typedef struct{
-	float w, x, y, z;
-}Quaternion;
+#include <mat.hpp>
 
 struct D455Data
 {
