@@ -17,7 +17,7 @@ namespace EMIRO
 	void pclConvert(Position position, Euler euler, pcl::PointCloud<pcl::PointXYZRGB>* in_pointcloud, pcl::PointCloud<pcl::PointXYZRGB>* out_pointcloud)
 	{
 		Eigen::Affine3f transform = Eigen::Affine3f::Identity();
-
+		out_pointcloud->points = in_pointcloud->points;
 	    transform.translation() << position.x, position.y, position.z;
 	    transform.rotate(euler_to_quaternion(euler));
 
@@ -25,18 +25,14 @@ namespace EMIRO
 
 	    // Apply the transformation only to the XYZ coordinates while keeping RGB values unchanged
 	    pcl::PointXYZRGB point;
-	    auto txr = transform * rotation;
 	    std::cout << std::fixed << std::setprecision(2);
 	    for (int i = 0; i < in_pointcloud->size(); ++i)
 	    {
-	        point = in_pointcloud->points[i];
-
-	        // Apply translation
-	        Eigen::Vector3f pt(point.x, point.y, point.z);
-
-	        out_pointcloud->points[i].x = pt.x() * transform;
-	        out_pointcloud->points[i].y = pt.y() * transform;
-	        out_pointcloud->points[i].z = pt.z() * transform;
+	        Eigen::Vector3f pt(in_pointcloud->points[i].x, in_pointcloud->points[i].y, in_pointcloud->points[i].z);
+	        Eigen::Vector3f transformed_pt = transform * pt;
+	        out_pointcloud->points[i].x = transformed_pt.x();
+	        out_pointcloud->points[i].y = transformed_pt.y();
+	        out_pointcloud->points[i].z = transformed_pt.z();
 	        std::cout << "x:" << in_pointcloud->points[i].x << ", y:" << in_pointcloud->points[i].y << ", z:" << in_pointcloud->points[i].z <<
 	        	"\tx:" << out_pointcloud->points[i].x << ", y:" << out_pointcloud->points[i].y << ", z:" << out_pointcloud->points[i].z << '\n';
 	    }

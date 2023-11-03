@@ -20,4 +20,5 @@ int main()
 
 	pcl::PointCloud<pcl::PointXYZRGB> out_pc;
 	EMIRO::pclConvert(p, euler, &pcl_pc, &out_pc);
+	return 0;
 }
