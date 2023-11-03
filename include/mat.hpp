@@ -42,6 +42,6 @@ namespace EMIRO
 	    transform.rotate(euler_to_quaternion(euler));
 
 	    // Apply the transformation to the second point cloud
-	    pcl::transformPointCloud(*out_pointcloud, *transformedCloud2, transform);
+	    pcl::transformPointCloud(*out_pointcloud, *in_pointcloud, transform);
 	}
 }
