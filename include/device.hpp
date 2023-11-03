@@ -1,13 +1,9 @@
 #ifndef DEVICE_HPP
 #define DEVICE_HPP
 
-#include <Eigen/Eigen>
 #include <librealsense2/rs.hpp>
 #include <boost/filesystem.hpp>
-#include <pcl/pcl_exports.h>
-#include <pcl/point_types.h>
-#include <pcl/impl/point_types.hpp>
-#include <pcl/io/pcd_io.h>
+#include <mat.hpp>
 #include <unistd.h>
 #include <iostream>
 #include <string>
@@ -19,7 +15,6 @@
 #include <thread>
 #include <functional>
 #include <atomic>
-#include <mat.hpp>
 
 struct D455Data
 {
