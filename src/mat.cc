@@ -49,8 +49,8 @@ namespace EMIRO
 	    {
 	        Eigen::Vector3f pt(in_pointcloud->points[i].x, in_pointcloud->points[i].y, in_pointcloud->points[i].z);
 	        Eigen::Vector3f transformed_pt = transform * pt;
-	        out_pointcloud->points[i].x = -transformed_pt.x();
-	        out_pointcloud->points[i].y = -transformed_pt.y();
+	        out_pointcloud->points[i].x = transformed_pt.x();
+	        out_pointcloud->points[i].y = transformed_pt.y();
 	        out_pointcloud->points[i].z = transformed_pt.z();
 	        std::cout << "x:" << in_pointcloud->points[i].x << ", y:" << in_pointcloud->points[i].y << ", z:" << in_pointcloud->points[i].z <<
 	        	"\tx:" << out_pointcloud->points[i].x << ", y:" << out_pointcloud->points[i].y << ", z:" << out_pointcloud->points[i].z << '\n';

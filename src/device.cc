@@ -268,6 +268,13 @@ namespace EMIRO
         std::cout << std::string(30, ' ') << '\n';
     }
 
+    rs2::points& Device::clean_pc(rs2::points& in_points)
+    {
+        rs2::points out_pc;
+
+        return out_pc;
+    }
+
     Device::~Device()
     {
         data.thread_en = false;

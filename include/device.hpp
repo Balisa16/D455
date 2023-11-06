@@ -16,6 +16,44 @@
 #include <functional>
 #include <atomic>
 
+typedef struct{
+	float x, y, z;
+}Pos;
+
+typedef struct{
+	float r, g, b;
+}Color;
+
+struct PointCloud{
+	std::vector<Pos> position;
+	std::vector<Color> color;
+	uint32_t size;
+
+	PointCloud():size(0){}
+
+	PointCloud& operator=(const PointCloud& other) {
+        if (this == &other) {
+            return *this; // Self-assignment, no need to do anything
+        }
+
+        position = other.position;
+        color = other.color;
+        size = other.size;
+
+        return *this;
+    }
+
+    PointCloud& operator+(const PointCloud& other) {
+    	for (int i = 0; i < other.size; ++i)
+    	{ 
+    		position.push_back(other.position[i]);
+    		color.push_back(other.color[i]);
+    		size++;
+    	}
+        return *this;;
+    }
+};
+
 struct D455Data
 {
 private:
@@ -83,6 +121,7 @@ namespace EMIRO
 		void get_pc(rs2::points& p, rs2::video_frame& c);
 		void convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output, float depth_lim = 5.0f);
 		void savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Position pos = {0.0f, 0.0f, 0.0f}, Quaternion quat = {0.0f, 0.0f, 0.0f, 0.0f}, std::string file_name = "pointcloud");
+		rs2::points& clean_pc(rs2::points& in_points);
 		~Device();
 		
 	};
