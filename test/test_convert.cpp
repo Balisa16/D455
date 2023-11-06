@@ -15,7 +15,7 @@ int main()
 	auto vert = pc.get_vertices();
 
 	dev.convert_to_PCL(pc, frame, pcl_pc, 3.0f);
-	Position p = {1.0f, 2.0f, 3.0f};
+	Position p = {0.0f, 0.0f, 0.0f};
 	Euler euler = {0.0f, 0.0f, 90.0f};
 
 	pcl::PointCloud<pcl::PointXYZRGB> out_pc;
