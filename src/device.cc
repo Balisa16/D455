@@ -182,9 +182,13 @@ namespace EMIRO
     {
         int width  = texture.get_width();
         int height = texture.get_height();
+
+        std::cout << "width : " << width << ",\theight : " << height << '\n';
         
         int x_value = std::min(std::max(int(Texture_XY.u * width  + .5f), 0), width - 1);
         int y_value = std::min(std::max(int(Texture_XY.v * height + .5f), 0), height - 1);
+
+        std::cout << "x val : " << x_value << ",\ty val : " << y_value << '\n';
 
         int bytes = x_value * texture.get_bytes_per_pixel();
         int strides = y_value * texture.get_stride_in_bytes();
@@ -216,9 +220,9 @@ namespace EMIRO
             if(Vertex[i].x > 5.0f || 
                 Vertex[i].y > 5.0f ||
                 Vertex[i].z > 5.0f) continue;
-            output.points[i].z = Vertex[i].x;
+            output.points[i].x = Vertex[i].x;
             output.points[i].y = Vertex[i].y;
-            output.points[i].x = Vertex[i].z < depth_lim ? Vertex[i].z : depth_lim;
+            output.points[i].z = Vertex[i].z < depth_lim ? Vertex[i].z : depth_lim;
             
             RGB_Texture(in_color, Texture_Coord[i], temp_rgb);
 

@@ -27,7 +27,7 @@ typedef struct{
 struct PointCloud{
 	std::vector<Pos> position;
 	std::vector<Color> color;
-	uint32_t size;
+	uint64_t size;
 
 	PointCloud():size(0){}
 
