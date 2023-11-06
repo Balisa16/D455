@@ -95,6 +95,8 @@ namespace EMIRO
 	extern Eigen::Quaternionf euler_to_quaternion(Euler euler);
 
 	extern void pclConvert(Position position, Euler euler, pcl::PointCloud<pcl::PointXYZRGB>* in_pointcloud, pcl::PointCloud<pcl::PointXYZRGB>* out_pointcloud);
+
+	extern void transform_pc(Position position, Euler euler, PointCloud* src, PointCloud* dst);
 }
 
 #endif

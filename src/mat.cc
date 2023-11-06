@@ -65,7 +65,6 @@ namespace EMIRO
 		dst->height = src->height;
 
 		Eigen::Affine3f transform = Eigen::Affine3f::Identity();
-		out_pointcloud->points = in_pointcloud->points;
 	    transform.translation() << position.x, position.y, position.z;
 	    Eigen::Quaternionf eu = euler_to_quaternion(euler);
 	    transform.rotate(eu);
