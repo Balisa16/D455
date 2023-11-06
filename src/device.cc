@@ -230,35 +230,40 @@ namespace EMIRO
         }
     }
 
-    void store_pc(rs2::points* in_points, PointCloud *store_data)
+    void Device::make_pointcloud(rs2::points* in_points, rs2::video_frame* in_color, PointCloud* pc)
     {
-        if(store_data->width <= 0)
-        {
-            std::cout << "Init store width and height\n";
-            auto sp = in_points.get_profile().as<rs2::video_stream_profile>();
-            store_data->width = sp.width();
-            store_data->height = sp.height();
-        }
+        auto sp = in_points->get_profile().as<rs2::video_stream_profile>();
+        pc->width = sp.width();
+        pc->height = sp.height();
 
-        char Texture_Coord = in_points->get_texture_coordinates();
-        char Vertex = in_points->get_vertices();
+        const rs2::texture_coordinate* texcoord = in_points->get_texture_coordinates();
+        const rs2::vertex* vert = in_points->get_vertices();
 
         RGB temp_rgb;
         for (int i = 0; i < in_points->size(); i++)
         {
-            if(Vertex[i].x > 5.0f || 
-                Vertex[i].y > 5.0f ||
-                Vertex[i].z > 5.0f) continue;
-            output.points[i].x = Vertex[i].x;
-            output.points[i].y = Vertex[i].y;
-            output.points[i].z = Vertex[i].z < depth_lim ? Vertex[i].z : depth_lim;
+            if(std::abs(vert[i].x) > 5.0f || std::abs(vert[i].x) > 0.01f)
+                continue;
             
-            RGB_Texture(in_color, Texture_Coord[i], temp_rgb);
+            RGB_Texture(*in_color, texcoord[i], temp_rgb);
 
-            output.points[i].r = temp_rgb.r;
-            output.points[i].g = temp_rgb.g;
-            output.points[i].b = temp_rgb.b;
+            pc->add(
+                {vert[i].x, vert[i].y, vert[i].z},
+                {temp_rgb.r, temp_rgb.g, temp_rgb.b});
         }
+    }
+
+    void Device::store_pc(PointCloud* src, PointCloud *dest)
+    {
+        if(dest->width <= 0)
+        {
+            std::cout << "Init store width and height\n";
+            dest->width = src->width;
+            dest->height = src->height;
+        }
+
+        (*dest) += (*src);
+        std::cout << "Size : " << dest->size << '\n';
     }
 
     void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Position pos, Quaternion quat, std::string file_name)
