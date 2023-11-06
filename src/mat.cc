@@ -56,4 +56,31 @@ namespace EMIRO
 	        	"\tx:" << out_pointcloud->points[i].x << ", y:" << out_pointcloud->points[i].y << ", z:" << out_pointcloud->points[i].z << '\n';*/
 	    }
 	}
+
+	void transform_pc(Position position, Euler euler, PointCloud* src, PointCloud* dst)
+	{
+		dst->position.clear();
+		dst->color.clear();
+		dst->width = src->width;
+		dst->height = src->height;
+
+		Eigen::Affine3f transform = Eigen::Affine3f::Identity();
+		out_pointcloud->points = in_pointcloud->points;
+	    transform.translation() << position.x, position.y, position.z;
+	    Eigen::Quaternionf eu = euler_to_quaternion(euler);
+	    transform.rotate(eu);
+
+	    pcl::PointXYZRGB point;
+	    // std::cout << std::fixed << std::setprecision(2);
+	    for (int i = 0; i < src->size; ++i)
+	    {
+	        Eigen::Vector3f pt(src->position[i].x, src->position[i].y, src->position[i].z);
+	        Eigen::Vector3f transformed_pt = transform * pt;
+	        dst->position[i].x = transformed_pt.x();
+	        dst->position[i].y = transformed_pt.y();
+	        dst->position[i].z = transformed_pt.z();
+	        /*std::cout << "x:" << in_pointcloud->points[i].x << ", y:" << in_pointcloud->points[i].y << ", z:" << in_pointcloud->points[i].z <<
+	        	"\tx:" << out_pointcloud->points[i].x << ", y:" << out_pointcloud->points[i].y << ", z:" << out_pointcloud->points[i].z << '\n';*/
+	    }
+	}
 }
