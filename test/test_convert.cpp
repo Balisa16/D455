@@ -11,7 +11,7 @@ int main()
 
 	pcl::PointCloud<pcl::PointXYZRGB> pcl_pc;
 
-	int cnt = 5;
+	int cnt = 1;
 	while(cnt)
 	{
 		dev.get_pc(pc, frame);
@@ -23,6 +23,8 @@ int main()
 
 		pcl::PointCloud<pcl::PointXYZRGB> out_pc;
 		EMIRO::pclConvert(p, euler, &pcl_pc, &out_pc);
+		cnt--;
+	
 	}
 	return 0;
 }

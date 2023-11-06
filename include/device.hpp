@@ -28,6 +28,7 @@ struct PointCloud{
 	std::vector<Pos> position;
 	std::vector<Color> color;
 	uint64_t size;
+	int width, height;
 
 	PointCloud():size(0){}
 
@@ -120,6 +121,7 @@ namespace EMIRO
 		Device();
 		void get_pc(rs2::points& p, rs2::video_frame& c);
 		void convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output, float depth_lim = 5.0f);
+		void store_pc(rs2::points* in_points, PointCloud *store_data);
 		void savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Position pos = {0.0f, 0.0f, 0.0f}, Quaternion quat = {0.0f, 0.0f, 0.0f, 0.0f}, std::string file_name = "pointcloud");
 		rs2::points& clean_pc(rs2::points& in_points);
 		~Device();
