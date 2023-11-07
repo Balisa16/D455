@@ -30,7 +30,11 @@ int main()
 
 		dev.store_pc(&pc_temp2, &pc_main);
 
-		std::cout << "Pos size : " << pc_main.position.size() << '\n';
+		std::cout << "Wait\n";
+
+		std::this_thread::sleep_for(std::chrono::seconds(3));
+
+		std::cout << "Ok\n";
 
 		/*dev.convert_to_PCL(pc, frame, pcl_pc, 3.0f);
 		
