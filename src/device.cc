@@ -258,7 +258,7 @@ namespace EMIRO
             dest->height = src->height;
         }
 
-        dest->width += src->width;
+        dest->width = src->width;
         dest->height = src->height;
 
         (*dest) += (*src);
@@ -276,6 +276,11 @@ namespace EMIRO
             pc.width = w_new;
             pc.height = h_new;
         }*/
+
+        std::cout << "Size : " << pc.size() << '\n';
+
+        std::cout << "w : " << pc.width << '\n';
+        std::cout << "h : " << pc.height << '\n';
 
         // Set sample position and sample quaternion
         pc.sensor_origin_ = {pos.x(), pos.y(), pos.z(), 1.0f};
