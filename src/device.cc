@@ -287,6 +287,23 @@ namespace EMIRO
         (*dest) += (*src);
     }
 
+    void Device::get_orientation(Euler* euler)
+    {
+        auto motion = data.frames.as<rs2::motion_frame>();
+
+        if (motion && motion.get_profile().stream_type() == RS2_STREAM_GYRO && 
+            motion.get_profile().format() == RS2_FORMAT_MOTION_XYZ32F)
+        {
+            rs2_vector gyro_data = motion.get_motion_data();
+            
+            euler->roll = gyro_data.z; 
+            euler->pitch = gyro_data.x;
+            euler->yaw = gyro_data.y;
+        }
+        else
+            std::cout << "Failed update orientation\n";
+    }
+
     void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Eigen::Vector3f pos, Quaternion quat, std::string file_name)
     {
         /*int w_ratio = 848, h_ratio = 480;

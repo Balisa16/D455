@@ -77,12 +77,21 @@ namespace EMIRO
 	public:
 
 		Device();
+		
 		void get_pc(rs2::points& p, rs2::video_frame& c, Quaternion& quaternion);
+		
 		void convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output, float depth_lim = 5.0f);
+		
 		void make_pointcloud(rs2::points* in_points, rs2::video_frame* in_color, PointCloud* pc);
+		
 		void store_pc(PointCloud* src, PointCloud *dest);
+
+		void get_orientation(Euler* euler);
+		
 		void savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Eigen::Vector3f pos = {0.0f, 0.0f, 0.0f}, Quaternion quat = {0.0f, 0.0f, 0.0f, 0.0f}, std::string file_name = "pointcloud");
+		
 		rs2::points& clean_pc(rs2::points& in_points);
+		
 		~Device();
 		
 	};

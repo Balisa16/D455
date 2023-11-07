@@ -29,8 +29,10 @@ int main()
 
 		dev.make_pointcloud(&pc, &frame, &pc_temp);
 
-		// mat.transform_pc(p, euler, &pc_temp, &pc_temp2);
-		mat.transform_pc(p, quat, &pc_temp, &pc_temp2);
+		dev.get_orientation(&euler);
+
+		mat.transform_pc(p, euler, &pc_temp, &pc_temp2);
+		// mat.transform_pc(p, quat, &pc_temp, &pc_temp2);
 		
 		dev.store_pc(&pc_temp2, &pc_main);
 
