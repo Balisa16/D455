@@ -254,7 +254,6 @@ namespace EMIRO
     {
         if(dest->width <= 0)
         {
-            std::cout << "Init store width and height\n";
             dest->width = src->width;
             dest->height = src->height;
         }
@@ -267,7 +266,7 @@ namespace EMIRO
 
     void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Eigen::Vector3f pos, Quaternion quat, std::string file_name)
     {
-        int w_ratio = 848, h_ratio = 480;
+        /*int w_ratio = 848, h_ratio = 480;
         float ratio = h_ratio / (float) w_ratio;
         if(pc.points.size() != w_ratio*h_ratio)
         {
@@ -276,7 +275,7 @@ namespace EMIRO
             std::cout << "Resize :\nw\t: " << pc.width << " -> " << w_new << "\nh\t: " << pc.height << " -> " << h_new << '\n';
             pc.width = w_new;
             pc.height = h_new;
-        }
+        }*/
 
         // Set sample position and sample quaternion
         pc.sensor_origin_ = {pos.x(), pos.y(), pos.z(), 1.0f};
