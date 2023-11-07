@@ -178,7 +178,7 @@ namespace EMIRO
         if(!output_file.is_open())throw;
     }
 
-    void Device::RGB_Texture(rs2::video_frame& texture, rs2::texture_coordinate Texture_XY, RGB& out_RGB)
+    void Device::RGB_Texture(rs2::video_frame& texture, rs2::texture_coordinate Texture_XY, Color& out_RGB)
     {
         int width  = texture.get_width();
         int height = texture.get_height();
@@ -207,12 +207,10 @@ namespace EMIRO
         output.is_dense = false;
         output.points.resize( in_points.size() );
 
-        std::cout << "w: " << output.width << ",\th: " << output.height << ",\tsize: " << in_points.size() << '\n';
-
         auto Texture_Coord = in_points.get_texture_coordinates();
         auto Vertex = in_points.get_vertices();
 
-        RGB temp_rgb;
+        Color temp_rgb;
         for (int i = 0; i < in_points.size(); i++)
         {
             if(Vertex[i].x > 5.0f || 
@@ -239,7 +237,7 @@ namespace EMIRO
         const rs2::texture_coordinate* texcoord = in_points->get_texture_coordinates();
         const rs2::vertex* vert = in_points->get_vertices();
 
-        RGB temp_rgb;
+        Color temp_rgb;
         for (int i = 0; i < in_points->size(); i++)
         {
             if(std::abs(vert[i].x) > 5.0f || std::abs(vert[i].x) > 0.01f)
@@ -263,13 +261,12 @@ namespace EMIRO
         }
 
         (*dest) += (*src);
-        std::cout << "Size : " << dest->size << '\n';
     }
 
-    void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Position pos, Quaternion quat, std::string file_name)
+    void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Eigen::Vector3f pos, Quaternion quat, std::string file_name)
     {
         // Set sample position and sample quaternion
-        pc.sensor_origin_ = {pos.x, pos.y, pos.z, 1.0f};
+        pc.sensor_origin_ = {pos.x(), pos.y(), pos.z(), 1.0f};
         pc.sensor_orientation_ = {quat.w, quat.x, quat.y, quat.z};
 
         std::string formatted_name = file_name + std::to_string(filename_idx) + ".pcd";
@@ -284,9 +281,9 @@ namespace EMIRO
 
         root["filename"] = formatted_name.c_str();
         root["time"] = buffer;
-        root["x"] = pos.x;
-        root["y"] = pos.y;
-        root["z"] = pos.z;
+        root["x"] = pos.x();
+        root["y"] = pos.y();
+        root["z"] = pos.z();
         root["qw"] = quat.w;
         root["qx"] = quat.x;
         root["qy"] = quat.y;

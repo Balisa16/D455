@@ -2,7 +2,9 @@
 
 namespace EMIRO
 {
-	Eigen::Quaternionf euler_to_quaternion(Euler euler)
+	Mat::Mat(){}
+
+	Eigen::Quaternionf Mat::euler_to_quaternion(Euler euler)
 	{
 		/*float roll2 = euler.roll/2.0f;
 		float pitch2 = euler.pitch/2.0f;
@@ -32,11 +34,11 @@ namespace EMIRO
 	    return {qw, qx, qy, qz};
 	}
 
-	void pclConvert(Position position, Euler euler, pcl::PointCloud<pcl::PointXYZRGB>* in_pointcloud, pcl::PointCloud<pcl::PointXYZRGB>* out_pointcloud)
+	void Mat::pclConvert(Eigen::Vector3f position, Euler euler, pcl::PointCloud<pcl::PointXYZRGB>* in_pointcloud, pcl::PointCloud<pcl::PointXYZRGB>* out_pointcloud)
 	{
 		Eigen::Affine3f transform = Eigen::Affine3f::Identity();
 		out_pointcloud->points = in_pointcloud->points;
-	    transform.translation() << position.x, position.y, position.z;
+	    transform.translation() << position.x(), position.y(), position.z();
 	    Eigen::Quaternionf eu = euler_to_quaternion(euler);
 	    transform.rotate(eu);
 
@@ -57,29 +59,56 @@ namespace EMIRO
 	    }
 	}
 
-	void transform_pc(Position position, Euler euler, PointCloud* src, PointCloud* dst)
+	void Mat::transform_pc(Eigen::Vector3f position, Euler euler, PointCloud* src, PointCloud* dst)
 	{
 		dst->position.clear();
-		dst->color.clear();
+		dst->color = src->color;
 		dst->width = src->width;
 		dst->height = src->height;
 
 		Eigen::Affine3f transform = Eigen::Affine3f::Identity();
-	    transform.translation() << position.x, position.y, position.z;
-	    Eigen::Quaternionf eu = euler_to_quaternion(euler);
-	    transform.rotate(eu);
+	    transform.translation() << position;
+	    transform.rotate(euler_to_quaternion(euler));
 
-	    pcl::PointXYZRGB point;
-	    // std::cout << std::fixed << std::setprecision(2);
 	    for (int i = 0; i < src->size; ++i)
-	    {
-	        Eigen::Vector3f pt(src->position[i].x, src->position[i].y, src->position[i].z);
-	        Eigen::Vector3f transformed_pt = transform * pt;
-	        dst->position[i].x = transformed_pt.x();
-	        dst->position[i].y = transformed_pt.y();
-	        dst->position[i].z = transformed_pt.z();
-	        /*std::cout << "x:" << in_pointcloud->points[i].x << ", y:" << in_pointcloud->points[i].y << ", z:" << in_pointcloud->points[i].z <<
-	        	"\tx:" << out_pointcloud->points[i].x << ", y:" << out_pointcloud->points[i].y << ", z:" << out_pointcloud->points[i].z << '\n';*/
-	    }
+	        dst->position[i] = transform * src->position[i];
 	}
+
+	void Mat::convert_to_pcl(PointCloud* src, pcl::PointCloud<pcl::PointXYZRGB>* dst)
+	{
+		// Clear
+		dst->clear();
+
+		// Get minimal size
+		uint64_t data_size = dst->size();
+		if(data_size != src->size)
+		{
+			data_size = std::min({data_size, src->size, src->position.size(), src->color.size()});
+			std::cout << "PCL Color Size : " << data_size << '\n';
+			if(data_size <= 0) return;
+		}
+
+		// Input width and height
+		dst->width = src->width;
+		dst->height = src->height;
+
+		// Save into PCL data
+		for (int i = 0; i < data_size; ++i)
+		{
+			/*const pcl::PointXYZRGB pos_col = {
+				src->position[i].x, src->position[i].y, src->position[i].z};*/
+			dst->points[i].x = src->position[i].x();
+			dst->points[i].y = src->position[i].y();
+			dst->points[i].z = src->position[i].z();
+
+			dst->points[i].r = src->color[i].r;
+			dst->points[i].g = src->color[i].g;
+			dst->points[i].b = src->color[i].b;
+			// dst->points[i].x = pcl::PointXYZRGB(
+				// src->position[i].x(), src->position[i].y(), src->position[i].z());
+				// src->color[i].r, src->color[i].g, src->color[i].b);
+		}
+	}
+
+	Mat::~Mat(){}
 }

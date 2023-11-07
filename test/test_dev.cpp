@@ -21,7 +21,7 @@ int main()
 		auto vert = pc.get_vertices();
 
 		dev.convert_to_PCL(pc, frame, pcl_pc, 3.0f);
-		Position p = {1.0f, 2.0f, 3.0f};
+		Eigen::Vector3f p = {1.0f, 2.0f, 3.0f};
 		Quaternion q = {0.75f, 0.76f, 0.77f, 0.78f};
 		dev.savePCD(pcl_pc, p, q);
 

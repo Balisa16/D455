@@ -30,18 +30,18 @@ typedef struct{
 }Euler;
 
 typedef struct{
-	float r, g, b;
+	uint8_t r, g, b;
 }Color;
 
 struct PointCloud{
-	std::vector<Position> position;
+	std::vector<Eigen::Vector3f> position;
 	std::vector<Color> color;
 	uint64_t size;
 	int width, height;
 
 	PointCloud():size(0){}
 
-	void add(const Position pos, const Color col)
+	void add(const Eigen::Vector3f pos, const Color col)
 	{
 		position.push_back(pos);
 		color.push_back(col);
@@ -92,11 +92,22 @@ struct PointCloud{
 
 namespace EMIRO
 {
-	extern Eigen::Quaternionf euler_to_quaternion(Euler euler);
+	class Mat
+	{
+	public:
+		Mat();
 
-	extern void pclConvert(Position position, Euler euler, pcl::PointCloud<pcl::PointXYZRGB>* in_pointcloud, pcl::PointCloud<pcl::PointXYZRGB>* out_pointcloud);
+		Eigen::Quaternionf euler_to_quaternion(Euler euler);
 
-	extern void transform_pc(Position position, Euler euler, PointCloud* src, PointCloud* dst);
+		void pclConvert(Eigen::Vector3f position, Euler euler, pcl::PointCloud<pcl::PointXYZRGB>* in_pointcloud, pcl::PointCloud<pcl::PointXYZRGB>* out_pointcloud);
+
+		void transform_pc(Eigen::Vector3f position, Euler euler, PointCloud* src, PointCloud* dst);
+		
+		void convert_to_pcl(PointCloud* src, pcl::PointCloud<pcl::PointXYZRGB>* dst);
+
+		~Mat();
+	};
+
 }
 
 #endif

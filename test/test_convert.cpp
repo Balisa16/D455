@@ -4,6 +4,7 @@
 int main()
 {
 	EMIRO::Device dev;
+	EMIRO::Mat mat;
 	int counter = 5;
 	rs2::points pc;
 	rs2::frame f;
@@ -11,18 +12,23 @@ int main()
 
 	pcl::PointCloud<pcl::PointXYZRGB> pcl_pc;
 
-	PointCloud pc_main, pc_temp;
+	PointCloud pc_main, pc_temp, pc_temp2;
 
-	int cnt = 100;
+	int cnt = 3;
 	while(cnt)
 	{
+		Eigen::Vector3f p = {0.0f, 0.0f, 0.0f};
+		Euler euler = {0.0f, cnt * 90.0f, 0.0f};
+
 		dev.get_pc(pc, frame);
 
 		pc_temp.clear();
 
 		dev.make_pointcloud(&pc, &frame, &pc_temp);
 
-		dev.store_pc(&pc_temp, &pc_main);
+		mat.transform_pc(p, euler, &pc_temp, &pc_temp2);
+
+		dev.store_pc(&pc_temp2, &pc_main);
 
 		std::cout << "Pos size : " << pc_main.position.size() << '\n';
 
@@ -36,5 +42,10 @@ int main()
 		cnt--;
 	
 	}
+	pcl::PointCloud<pcl::PointXYZRGB> out_pc;
+
+	mat.convert_to_pcl(&pc_main, &out_pc);
+
+	dev.savePCD(out_pc);
 	return 0;
 }
