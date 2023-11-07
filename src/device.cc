@@ -82,6 +82,8 @@ namespace EMIRO
 
         data.cfg.enable_stream(RS2_STREAM_DEPTH, 0, 848, 480, RS2_FORMAT_Z16, 30);
 
+        data.cfg.enable_stream(RS2_STREAM_POSE, RS2_FORMAT_6DOF);
+
     	data.cfg.enable_stream(RS2_STREAM_COLOR);
         // cfg.enable_stream(RS2_STREAM_INFRARED);
         // cfg.enable_stream(RS2_STREAM_DEPTH);
@@ -115,7 +117,7 @@ namespace EMIRO
         while(data.status != TStatus::Available);
     }
 
-    void Device::get_pc(rs2::points& p, rs2::video_frame& c)
+    void Device::get_pc(rs2::points& p, rs2::video_frame& c, Quaternion& quaternion)
     {
         while (data.lock.test_and_set(std::memory_order_acquire));
         data.color = data.frames.get_color_frame();
@@ -126,6 +128,9 @@ namespace EMIRO
         data.point = data.pc.calculate(depth);
         p = data.point;
         c = data.color;
+        rs2::pose_frame pose_frame = data.frames.first_or_default(RS2_STREAM_POSE);
+        rs2_pose pose_data = pose_frame.get_pose_data();
+        quaternion = {pose_data.rotation.w, pose_data.rotation.x, pose_data.rotation.y, pose_data.rotation.z};
         data.lock.clear(std::memory_order_release);
     }
 
@@ -256,7 +261,6 @@ namespace EMIRO
                 {temp_rgb.r, temp_rgb.g, temp_rgb.b});
         }
         pc->width = std::ceil(pc->size/(float)pc->height);
-        std::cout << pc->size << ", " << pc->width << ", " << pc->height << '\n';
     }
 
     void Device::store_pc(PointCloud* src, PointCloud *dest)
@@ -296,8 +300,6 @@ namespace EMIRO
             pc.points[current_size + i].g = 0;
             pc.points[current_size + i].b = 0;
         }
-
-        std::cout << "Save : " << current_size << ", " << pc.width << ", " << pc.height << '\n';
 
         // Set sample position and sample quaternion
         pc.sensor_origin_ = {pos.x(), pos.y(), pos.z(), 1.0f};

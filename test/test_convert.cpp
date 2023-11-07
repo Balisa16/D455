@@ -18,9 +18,10 @@ int main()
 	while(cnt)
 	{
 		Eigen::Vector3f p = {0.0f, 0.0f, 0.0f};
-		Euler euler = {0.0f, 0.0f, cnt * 90.0f};
+		Euler euler = {0.0f, cnt * 90.0f, 0.0f};
+		Quaternion quat;
 
-		dev.get_pc(pc, frame);
+		dev.get_pc(pc, frame, quat);
 
 		pc_temp.clear();
 
@@ -29,6 +30,8 @@ int main()
 		mat.transform_pc(p, euler, &pc_temp, &pc_temp2);
 		
 		dev.store_pc(&pc_temp2, &pc_main);
+
+		std::cout << "\nw : " << quat.w << ",\tx : " << quat.x << ",\ty : " << quat.y << ",\tz : " << quat.z << '\n';
 
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 

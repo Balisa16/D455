@@ -17,7 +17,8 @@ int main()
 
 	while(counter)
 	{
-		dev.get_pc(pc, frame);
+		Quaternion quat;
+		dev.get_pc(pc, frame, quat);
 		auto vert = pc.get_vertices();
 
 		dev.convert_to_PCL(pc, frame, pcl_pc, 3.0f);

@@ -77,7 +77,7 @@ namespace EMIRO
 	public:
 
 		Device();
-		void get_pc(rs2::points& p, rs2::video_frame& c);
+		void get_pc(rs2::points& p, rs2::video_frame& c, Quaternion& quaternion);
 		void convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output, float depth_lim = 5.0f);
 		void make_pointcloud(rs2::points* in_points, rs2::video_frame* in_color, PointCloud* pc);
 		void store_pc(PointCloud* src, PointCloud *dest);
