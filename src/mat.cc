@@ -46,7 +46,6 @@ namespace EMIRO
 
 	    // Apply the transformation only to the XYZ coordinates while keeping RGB values unchanged
 	    pcl::PointXYZRGB point;
-	    std::cout << std::fixed << std::setprecision(2);
 	    for (int i = 0; i < in_pointcloud->size(); ++i)
 	    {
 	        Eigen::Vector3f pt(in_pointcloud->points[i].x, in_pointcloud->points[i].y, in_pointcloud->points[i].z);
@@ -81,14 +80,11 @@ namespace EMIRO
 		// Get minimal size
 		uint64_t data_size = src->size;
 
-		std::cout << "PCL Color Size : " << data_size << '\n';
-
 		// Input width and height
 		dst->width = src->width;
 		dst->height = src->height;
 		dst->is_dense = false;
 		dst->points.resize(data_size);
-
 
 		// Save into PCL data
 		for (int i = 0; i < data_size; ++i)

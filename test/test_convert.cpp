@@ -18,7 +18,7 @@ int main()
 	while(cnt)
 	{
 		Eigen::Vector3f p = {0.0f, 0.0f, 0.0f};
-		Euler euler = {0.0f, cnt * 90.0f, 0.0f};
+		Euler euler = {0.0f, 0.0f, cnt * 90.0f};
 
 		dev.get_pc(pc, frame);
 
@@ -30,9 +30,7 @@ int main()
 		
 		dev.store_pc(&pc_temp2, &pc_main);
 
-		std::this_thread::sleep_for(std::chrono::seconds(3));
-
-		std::cout << "\nOk\n";
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 
 		cnt--;
 	

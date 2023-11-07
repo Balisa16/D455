@@ -229,8 +229,12 @@ namespace EMIRO
 
     void Device::make_pointcloud(rs2::points* in_points, rs2::video_frame* in_color, PointCloud* pc)
     {
+        // Remove temporary data
+        pc->position.clear();
+        pc->color.clear();
+        pc->size = 0;
+
         auto sp = in_points->get_profile().as<rs2::video_stream_profile>();
-        pc->width = sp.width();
         pc->height = sp.height();
 
         const rs2::texture_coordinate* texcoord = in_points->get_texture_coordinates();
@@ -239,25 +243,24 @@ namespace EMIRO
         Color temp_rgb;
         for (int i = 0; i < in_points->size(); i++)
         {
-            /*if(std::abs(vert[i].x) > 5.0f || std::abs(vert[i].x) > 0.01f)
-                continue;*/
+            // Filter data
+            if(std::abs(vert[i].x) > 5.0f || std::abs(vert[i].x) < 0.01f)
+                continue;
             
+            // Get match color
             RGB_Texture(*in_color, texcoord[i], temp_rgb);
 
+            // Save position and color
             pc->add(
                 {vert[i].x, vert[i].y, vert[i].z},
                 {temp_rgb.r, temp_rgb.g, temp_rgb.b});
         }
+        pc->width = std::ceil(pc->size/(float)pc->height);
+        std::cout << pc->size << ", " << pc->width << ", " << pc->height << '\n';
     }
 
     void Device::store_pc(PointCloud* src, PointCloud *dest)
     {
-        if(dest->width <= 0)
-        {
-            dest->width = src->width;
-            dest->height = src->height;
-        }
-
         dest->width = src->width;
         dest->height = src->height;
 
@@ -277,10 +280,24 @@ namespace EMIRO
             pc.height = h_new;
         }*/
 
-        std::cout << "Size : " << pc.size() << '\n';
+        int current_size = pc.size();
+        pc.width = std::ceil(current_size/(float)pc.height);
 
-        std::cout << "w : " << pc.width << '\n';
-        std::cout << "h : " << pc.height << '\n';
+        // Fill  blank data
+        int est_data = pc.height * pc.width;
+        int need_data = est_data - current_size;
+        pc.points.resize(est_data);
+        for(int i = 0; i < need_data; i++)
+        {
+            pc.points[current_size + i].x = 0.0f;
+            pc.points[current_size + i].y = 0.0f;
+            pc.points[current_size + i].z = 0.0f;
+            pc.points[current_size + i].r = 0;
+            pc.points[current_size + i].g = 0;
+            pc.points[current_size + i].b = 0;
+        }
+
+        std::cout << "Save : " << current_size << ", " << pc.width << ", " << pc.height << '\n';
 
         // Set sample position and sample quaternion
         pc.sensor_origin_ = {pos.x(), pos.y(), pos.z(), 1.0f};
