@@ -7,7 +7,6 @@ namespace EMIRO
     {
         data->status = TStatus::Init;
         std::thread::id th_id = std::this_thread::get_id();
-        std::cout << "Thread Detach in " << th_id << '\n';
         float maks_fps = 40.0f;
         std::cout << std::fixed << std::setprecision(2);
 
@@ -260,11 +259,25 @@ namespace EMIRO
             dest->height = src->height;
         }
 
+        dest->width += src->width;
+        dest->height += src->height;
+
         (*dest) += (*src);
     }
 
     void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Eigen::Vector3f pos, Quaternion quat, std::string file_name)
     {
+        int w_ratio = 848, h_ratio = 480;
+        float ratio = h_ratio / (float) w_ratio;
+        if(pc.points.size() != w_ratio*h_ratio)
+        {
+            int w_new = w_ratio * (1.f - ratio) * pc.points.size() /(float)(w_ratio * h_ratio);
+            int h_new = h_ratio * ratio * pc.points.size() /(float)(w_ratio * h_ratio);
+            std::cout << "Resize :\nw\t: " << pc.width << " -> " << w_new << "\nh\t: " << pc.height << " -> " << h_new << '\n';
+            pc.width = w_new;
+            pc.height = h_new;
+        }
+
         // Set sample position and sample quaternion
         pc.sensor_origin_ = {pos.x(), pos.y(), pos.z(), 1.0f};
         pc.sensor_orientation_ = {quat.w, quat.x, quat.y, quat.z};

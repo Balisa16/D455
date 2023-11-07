@@ -27,22 +27,15 @@ int main()
 		dev.make_pointcloud(&pc, &frame, &pc_temp);
 
 		mat.transform_pc(p, euler, &pc_temp, &pc_temp2);
-
+		
 		dev.store_pc(&pc_temp2, &pc_main);
 
-		std::cout << "Wait\n";
+		std::cout << "\nWait\n";
 
 		std::this_thread::sleep_for(std::chrono::seconds(3));
 
-		std::cout << "Ok\n";
+		std::cout << "\nOk\n";
 
-		/*dev.convert_to_PCL(pc, frame, pcl_pc, 3.0f);
-		
-		Position p = {0.0f, 0.0f, 0.0f};
-		Euler euler = {0.0f, 90.0f, 0.0f};
-
-		pcl::PointCloud<pcl::PointXYZRGB> out_pc;
-		EMIRO::pclConvert(p, euler, &pcl_pc, &out_pc);*/
 		cnt--;
 	
 	}

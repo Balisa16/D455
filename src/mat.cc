@@ -61,10 +61,11 @@ namespace EMIRO
 
 	void Mat::transform_pc(Eigen::Vector3f position, Euler euler, PointCloud* src, PointCloud* dst)
 	{
-		dst->position.clear();
+		dst->position = src->position;
 		dst->color = src->color;
 		dst->width = src->width;
 		dst->height = src->height;
+		dst->size = src->size;
 
 		Eigen::Affine3f transform = Eigen::Affine3f::Identity();
 	    transform.translation() << position;
@@ -72,31 +73,26 @@ namespace EMIRO
 
 	    for (int i = 0; i < src->size; ++i)
 	        dst->position[i] = transform * src->position[i];
+		
 	}
 
 	void Mat::convert_to_pcl(PointCloud* src, pcl::PointCloud<pcl::PointXYZRGB>* dst)
 	{
-		// Clear
-		dst->clear();
-
 		// Get minimal size
-		uint64_t data_size = dst->size();
-		if(data_size != src->size)
-		{
-			data_size = std::min({data_size, src->size, src->position.size(), src->color.size()});
-			std::cout << "PCL Color Size : " << data_size << '\n';
-			if(data_size <= 0) return;
-		}
+		uint64_t data_size = src->size;
+
+		std::cout << "PCL Color Size : " << data_size << '\n';
 
 		// Input width and height
 		dst->width = src->width;
 		dst->height = src->height;
+		dst->is_dense = false;
+		dst->points.resize(data_size);
+
 
 		// Save into PCL data
 		for (int i = 0; i < data_size; ++i)
 		{
-			/*const pcl::PointXYZRGB pos_col = {
-				src->position[i].x, src->position[i].y, src->position[i].z};*/
 			dst->points[i].x = src->position[i].x();
 			dst->points[i].y = src->position[i].y();
 			dst->points[i].z = src->position[i].z();
@@ -104,9 +100,6 @@ namespace EMIRO
 			dst->points[i].r = src->color[i].r;
 			dst->points[i].g = src->color[i].g;
 			dst->points[i].b = src->color[i].b;
-			// dst->points[i].x = pcl::PointXYZRGB(
-				// src->position[i].x(), src->position[i].y(), src->position[i].z());
-				// src->color[i].r, src->color[i].g, src->color[i].b);
 		}
 	}
 
