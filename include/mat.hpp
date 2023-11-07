@@ -102,6 +102,8 @@ namespace EMIRO
 		void pclConvert(Eigen::Vector3f position, Euler euler, pcl::PointCloud<pcl::PointXYZRGB>* in_pointcloud, pcl::PointCloud<pcl::PointXYZRGB>* out_pointcloud);
 
 		void transform_pc(Eigen::Vector3f position, Euler euler, PointCloud* src, PointCloud* dst);
+
+		void transform_pc(Eigen::Vector3f position, Quaternion quat, PointCloud* src, PointCloud* dst);
 		
 		void convert_to_pcl(PointCloud* src, pcl::PointCloud<pcl::PointXYZRGB>* dst);
 

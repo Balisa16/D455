@@ -82,7 +82,14 @@ namespace EMIRO
 
         data.cfg.enable_stream(RS2_STREAM_DEPTH, 0, 848, 480, RS2_FORMAT_Z16, 30);
 
-        data.cfg.enable_stream(RS2_STREAM_POSE, RS2_FORMAT_6DOF);
+        std::cout << "Cek 1\n";
+
+        // data.cfg.enable_stream(RS2_STREAM_POSE, RS2_FORMAT_6DOF);
+        data.cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+        
+        data.cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+
+        std::cout << "Cek 2\n";
 
     	data.cfg.enable_stream(RS2_STREAM_COLOR);
         // cfg.enable_stream(RS2_STREAM_INFRARED);
@@ -128,8 +135,17 @@ namespace EMIRO
         data.point = data.pc.calculate(depth);
         p = data.point;
         c = data.color;
+
+        std::cout << "Cek 3\n";
+
         rs2::pose_frame pose_frame = data.frames.first_or_default(RS2_STREAM_POSE);
+
+        std::cout << "Cek 4\n";
+
         rs2_pose pose_data = pose_frame.get_pose_data();
+
+        std::cout << "Cek 5\n";
+
         quaternion = {pose_data.rotation.w, pose_data.rotation.x, pose_data.rotation.y, pose_data.rotation.z};
         data.lock.clear(std::memory_order_release);
     }

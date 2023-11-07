@@ -75,6 +75,23 @@ namespace EMIRO
 		
 	}
 
+	void Mat::transform_pc(Eigen::Vector3f position, Quaternion quat, PointCloud* src, PointCloud* dst)
+	{
+		dst->position = src->position;
+		dst->color = src->color;
+		dst->width = src->width;
+		dst->height = src->height;
+		dst->size = src->size;
+
+		Eigen::Affine3f transform = Eigen::Affine3f::Identity();
+	    transform.translation() << position;
+	    transform.rotate(Eigen::Quaternionf(quat.w, quat.x, quat.y, quat.z));
+
+	    for (int i = 0; i < src->size; ++i)
+	        dst->position[i] = transform * src->position[i];
+		
+	}
+
 	void Mat::convert_to_pcl(PointCloud* src, pcl::PointCloud<pcl::PointXYZRGB>* dst)
 	{
 		// Get minimal size

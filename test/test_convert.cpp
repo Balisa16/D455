@@ -14,7 +14,9 @@ int main()
 
 	PointCloud pc_main, pc_temp, pc_temp2;
 
-	int cnt = 3;
+	std::this_thread::sleep_for(std::chrono::seconds(2));
+
+	int cnt = 6;
 	while(cnt)
 	{
 		Eigen::Vector3f p = {0.0f, 0.0f, 0.0f};
@@ -27,13 +29,18 @@ int main()
 
 		dev.make_pointcloud(&pc, &frame, &pc_temp);
 
-		mat.transform_pc(p, euler, &pc_temp, &pc_temp2);
+		// mat.transform_pc(p, euler, &pc_temp, &pc_temp2);
+		mat.transform_pc(p, quat, &pc_temp, &pc_temp2);
 		
 		dev.store_pc(&pc_temp2, &pc_main);
 
 		std::cout << "\nw : " << quat.w << ",\tx : " << quat.x << ",\ty : " << quat.y << ",\tz : " << quat.z << '\n';
 
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		std::cout << "\nWait\n";
+
+		std::this_thread::sleep_for(std::chrono::seconds(2));
+
+		std::cout << "\nOk\n";
 
 		cnt--;
 	
