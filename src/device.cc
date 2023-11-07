@@ -239,8 +239,8 @@ namespace EMIRO
         Color temp_rgb;
         for (int i = 0; i < in_points->size(); i++)
         {
-            if(std::abs(vert[i].x) > 5.0f || std::abs(vert[i].x) > 0.01f)
-                continue;
+            /*if(std::abs(vert[i].x) > 5.0f || std::abs(vert[i].x) > 0.01f)
+                continue;*/
             
             RGB_Texture(*in_color, texcoord[i], temp_rgb);
 
@@ -260,7 +260,7 @@ namespace EMIRO
         }
 
         dest->width += src->width;
-        dest->height += src->height;
+        dest->height = src->height;
 
         (*dest) += (*src);
     }

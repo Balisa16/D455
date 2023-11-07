@@ -30,8 +30,6 @@ int main()
 		
 		dev.store_pc(&pc_temp2, &pc_main);
 
-		std::cout << "\nWait\n";
-
 		std::this_thread::sleep_for(std::chrono::seconds(3));
 
 		std::cout << "\nOk\n";
