@@ -3,6 +3,7 @@
 
 namespace EMIRO
 {
+
     void frames_update(D455Data* data)
     {
         data->status = TStatus::Init;
@@ -79,7 +80,34 @@ namespace EMIRO
         else
             std::cout << "% \033[32m[OK]\033[0m\n";
         std::cout.flush();
-}
+    }
+
+    bool Device::check_imu()
+    {
+        bool found_gyro = false;
+        bool found_accel = false;
+        rs2::context ctx;
+        for (auto dev : ctx.query_devices())
+        {
+            // The same device should support gyro and accel
+            found_gyro = false;
+            found_accel = false;
+            for (auto sensor : dev.query_sensors())
+            {
+                for (auto profile : sensor.get_stream_profiles())
+                {
+                    if (profile.stream_type() == RS2_STREAM_GYRO)
+                        found_gyro = true;
+
+                    if (profile.stream_type() == RS2_STREAM_ACCEL)
+                        found_accel = true;
+                }
+            }
+            if (found_gyro && found_accel)
+                break;
+        }
+        return found_gyro && found_accel;
+    }
 
     Device::Device() : 
         builder(),
@@ -88,6 +116,9 @@ namespace EMIRO
         data.t_past = std::chrono::high_resolution_clock::now();
 
         check_dir();
+
+        if(!check_imu())
+            throw std::runtime_error("\033[31mIMU is not Support\033[0m");
 
         data.cfg.enable_stream(RS2_STREAM_DEPTH, 0, 848, 480, RS2_FORMAT_Z16, 30);
 

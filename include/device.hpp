@@ -15,6 +15,7 @@
 #include <thread>
 #include <functional>
 #include <atomic>
+#include <stdexcept>
 
 
 struct D455Data
@@ -79,6 +80,8 @@ namespace EMIRO
 	public:
 
 		Device();
+
+		bool check_imu();
 		
 		void get_pc(rs2::points& p, rs2::video_frame& c, Euler* euler);
 		
