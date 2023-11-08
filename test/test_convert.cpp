@@ -23,13 +23,13 @@ int main()
 		Euler euler = {0.0f, cnt * 90.0f, 0.0f};
 		Quaternion quat;
 
-		dev.get_pc(pc, frame);
+		dev.get_pc(pc, frame, euler);
 
 		pc_temp.clear();
 
 		dev.make_pointcloud(&pc, &frame, &pc_temp);
 
-		dev.get_orientation(&euler);
+		// dev.get_orientation(&euler);
 
 		mat.transform_pc(p, euler, &pc_temp, &pc_temp2);
 		// mat.transform_pc(p, quat, &pc_temp, &pc_temp2);

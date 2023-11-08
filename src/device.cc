@@ -135,7 +135,7 @@ namespace EMIRO
         while(data.status != TStatus::Available);
     }
 
-    void Device::get_pc(rs2::points& p, rs2::video_frame& c)
+    void Device::get_pc(rs2::points& p, rs2::video_frame& c, Euler& euler)
     {
         while (data.lock.test_and_set(std::memory_order_acquire));
         data.color = data.frames.get_color_frame();
@@ -146,6 +146,7 @@ namespace EMIRO
         data.point = data.pc.calculate(depth);
         p = data.point;
         c = data.color;
+        euler = data.euler;
         data.lock.clear(std::memory_order_release);
     }
 
