@@ -19,7 +19,7 @@ int main()
 	{
 		Quaternion quat;
 		Euler euler;
-		dev.get_pc(pc, frame, euler);
+		dev.get_pc(pc, frame, &euler);
 		auto vert = pc.get_vertices();
 
 		dev.convert_to_PCL(pc, frame, pcl_pc, 3.0f);

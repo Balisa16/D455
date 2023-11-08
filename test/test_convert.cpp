@@ -23,9 +23,9 @@ int main()
 		Euler euler = {0.0f, cnt * 90.0f, 0.0f};
 		Quaternion quat;
 
-		dev.get_pc(pc, frame, euler);
+		dev.get_pc(pc, frame, &euler);
 
-		std::cout << "\nr : " << euler.roll << ",\tp : " << euler.pitch << ",\ty : " << euler.yaw << '\n';
+		std::cout << "roll : " << euler.roll << ",\tpitch : " << euler.pitch << ",\tyaw : " << euler.yaw << '\n';
 
 		pc_temp.clear();
 

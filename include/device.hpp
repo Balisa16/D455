@@ -80,7 +80,7 @@ namespace EMIRO
 
 		Device();
 		
-		void get_pc(rs2::points& p, rs2::video_frame& c, Euler& euler);
+		void get_pc(rs2::points& p, rs2::video_frame& c, Euler* euler);
 		
 		void convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output, float depth_lim = 5.0f);
 		

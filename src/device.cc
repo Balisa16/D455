@@ -20,16 +20,12 @@ namespace EMIRO
             // Update gyro data
             auto motion = data->frames.as<rs2::motion_frame>();
 
-            if (motion && motion.get_profile().stream_type() == RS2_STREAM_GYRO && 
-                motion.get_profile().format() == RS2_FORMAT_MOTION_XYZ32F)
-            {
-                rs2_vector gyro_data = motion.get_motion_data();
-                
-                data->euler.roll = gyro_data.z; 
-                data->euler.pitch = gyro_data.x;
-                data->euler.yaw = gyro_data.y;
-            }
-                
+            std::cout << "\n" << motion << std::endl;
+            /*rs2_vector gyro_data = motion.get_motion_data();
+            data->euler.roll = gyro_data.z; 
+            data->euler.pitch = gyro_data.x;
+            data->euler.yaw = gyro_data.y;*/
+
             // Release the lock
             data->lock.clear(std::memory_order_release);
 
@@ -135,7 +131,7 @@ namespace EMIRO
         while(data.status != TStatus::Available);
     }
 
-    void Device::get_pc(rs2::points& p, rs2::video_frame& c, Euler& euler)
+    void Device::get_pc(rs2::points& p, rs2::video_frame& c, Euler* euler)
     {
         while (data.lock.test_and_set(std::memory_order_acquire));
         data.color = data.frames.get_color_frame();
@@ -146,7 +142,10 @@ namespace EMIRO
         data.point = data.pc.calculate(depth);
         p = data.point;
         c = data.color;
-        euler = data.euler;
+
+        euler->roll = data.euler.roll;
+        euler->pitch = data.euler.pitch;
+        euler->yaw = data.euler.yaw;
         data.lock.clear(std::memory_order_release);
     }
 
