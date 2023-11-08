@@ -20,7 +20,6 @@ namespace EMIRO
             // Update gyro data
             auto motion = data->frames.as<rs2::motion_frame>();
 
-            std::cout << "\n" << motion << std::endl;
             /*rs2_vector gyro_data = motion.get_motion_data();
             data->euler.roll = gyro_data.z; 
             data->euler.pitch = gyro_data.x;
