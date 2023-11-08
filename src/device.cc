@@ -16,7 +16,20 @@ namespace EMIRO
 
             data->frames = data->pipe.wait_for_frames();
             data->status = TStatus::Available;
-            
+
+            // Update gyro data
+            auto motion = data->frames.as<rs2::motion_frame>();
+
+            if (motion && motion.get_profile().stream_type() == RS2_STREAM_GYRO && 
+                motion.get_profile().format() == RS2_FORMAT_MOTION_XYZ32F)
+            {
+                rs2_vector gyro_data = motion.get_motion_data();
+                
+                data->euler.roll = gyro_data.z; 
+                data->euler.pitch = gyro_data.x;
+                data->euler.yaw = gyro_data.y;
+            }
+                
             // Release the lock
             data->lock.clear(std::memory_order_release);
 
@@ -78,18 +91,16 @@ namespace EMIRO
         writer(builder.newStreamWriter())
     {
         data.t_past = std::chrono::high_resolution_clock::now();
+
         check_dir();
 
         data.cfg.enable_stream(RS2_STREAM_DEPTH, 0, 848, 480, RS2_FORMAT_Z16, 30);
-
-        std::cout << "Cek 1\n";
 
         // data.cfg.enable_stream(RS2_STREAM_POSE, RS2_FORMAT_6DOF);
         data.cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
         
         data.cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
 
-        std::cout << "Cek 2\n";
 
     	data.cfg.enable_stream(RS2_STREAM_COLOR);
         // cfg.enable_stream(RS2_STREAM_INFRARED);
@@ -124,7 +135,7 @@ namespace EMIRO
         while(data.status != TStatus::Available);
     }
 
-    void Device::get_pc(rs2::points& p, rs2::video_frame& c, Quaternion& quaternion)
+    void Device::get_pc(rs2::points& p, rs2::video_frame& c)
     {
         while (data.lock.test_and_set(std::memory_order_acquire));
         data.color = data.frames.get_color_frame();
@@ -135,18 +146,6 @@ namespace EMIRO
         data.point = data.pc.calculate(depth);
         p = data.point;
         c = data.color;
-
-        std::cout << "Cek 3\n";
-
-        rs2::pose_frame pose_frame = data.frames.first_or_default(RS2_STREAM_POSE);
-
-        std::cout << "Cek 4\n";
-
-        rs2_pose pose_data = pose_frame.get_pose_data();
-
-        std::cout << "Cek 5\n";
-
-        quaternion = {pose_data.rotation.w, pose_data.rotation.x, pose_data.rotation.y, pose_data.rotation.z};
         data.lock.clear(std::memory_order_release);
     }
 

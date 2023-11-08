@@ -37,6 +37,8 @@ public:
     std::chrono::time_point<std::chrono::high_resolution_clock> t_now;
     std::chrono::time_point<std::chrono::high_resolution_clock> t_past;
 
+    Euler euler;
+
     D455Data() :
         thread_en(true),  // Initialize boolean member
         status(TStatus::None),  // Initialize 'status' with TStatus::None
@@ -78,7 +80,7 @@ namespace EMIRO
 
 		Device();
 		
-		void get_pc(rs2::points& p, rs2::video_frame& c, Quaternion& quaternion);
+		void get_pc(rs2::points& p, rs2::video_frame& c);
 		
 		void convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output, float depth_lim = 5.0f);
 		

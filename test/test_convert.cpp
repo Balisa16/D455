@@ -23,7 +23,7 @@ int main()
 		Euler euler = {0.0f, cnt * 90.0f, 0.0f};
 		Quaternion quat;
 
-		dev.get_pc(pc, frame, quat);
+		dev.get_pc(pc, frame);
 
 		pc_temp.clear();
 
