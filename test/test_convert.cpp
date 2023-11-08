@@ -25,6 +25,8 @@ int main()
 
 		dev.get_pc(pc, frame, euler);
 
+		std::cout << "\nr : " << euler.roll << ",\tp : " << euler.pitch << ",\ty : " << euler.yaw << '\n';
+
 		pc_temp.clear();
 
 		dev.make_pointcloud(&pc, &frame, &pc_temp);
@@ -36,7 +38,6 @@ int main()
 		
 		dev.store_pc(&pc_temp2, &pc_main);
 
-		std::cout << "\nw : " << quat.w << ",\tx : " << quat.x << ",\ty : " << quat.y << ",\tz : " << quat.z << '\n';
 
 		std::cout << "\nWait\n";
 
