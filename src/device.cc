@@ -386,8 +386,10 @@ namespace EMIRO
         root["qx"] = quat.x;
         root["qy"] = quat.y;
         root["qz"] = quat.z;
+
         if(filename_idx > 1)
             output_file << ",\n";
+            
         writer->write(root, &output_file);
         filename_idx++;
 
