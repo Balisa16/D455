@@ -10,3 +10,6 @@
 [submodule "thirdparty/librealsense"]
 	path = thirdparty/librealsense
 	url = https://github.com/IntelRealSense/librealsense.git
+[submodule "thirdparty/jsoncpp"]
+	path = thirdparty/jsoncpp
+	url = https://github.com/open-source-parsers/jsoncpp.git

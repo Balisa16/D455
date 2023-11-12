@@ -3,12 +3,12 @@
 
 #include <librealsense2/rs.hpp>
 #include <boost/filesystem.hpp>
+#include <json/json.h>
 #include <mat.hpp>
 #include <unistd.h>
 #include <iostream>
 #include <string>
 #include <cmath>
-#include <json/json.h>
 #include <memory>
 #include <chrono>
 #include <iomanip> 

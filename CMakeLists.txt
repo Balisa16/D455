@@ -11,6 +11,7 @@ find_package(PCL REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system filesystem)
 find_package(jsoncpp REQUIRED)
 
+# add_subdirectory(thirdparty/jsoncpp)
 add_subdirectory(thirdparty/glfw)
 add_subdirectory(thirdparty/glm)
 add_subdirectory(thirdparty/librealsense)
@@ -19,13 +20,19 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(DEPENDENCIES realsense2)
 
 include_directories(
+    thirdparty/jsoncpp/include
     ${PCL_INCLUDE_DIRS}
     thirdparty/glfw/include
-    thirdparty/glfw/src
     thirdparty/glm/glm
     thirdparty/librealsense/include
-    ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/src)
+    ${PROJECT_SOURCE_DIR}/include)
+
+# add_library(LIBS_JSON STATIC
+# thirdparty/jsoncpp/src/lib_json/json_reader.cpp
+# thirdparty/jsoncpp/src/lib_json/json_value.cpp
+# thirdparty/jsoncpp/src/lib_json/json_writer.cpp
+# thirdparty/jsoncpp/src/jsontestrunner/main.cpp
+# )
 
 add_library(ADDED_LIBS STATIC
     src/callback.cc
@@ -36,13 +43,16 @@ add_library(ADDED_LIBS STATIC
     src/glad.c
     src/stb_image.cc)
 
-link_directories(${PCL_LIBRARY_DIRS})
+link_directories(
+    ${PCL_LIBRARY_DIRS}
+    thirdparty/jsoncpp/build/lib
+)
 add_definitions(${PCL_DEFINITIONS})
 
 target_link_libraries(ADDED_LIBS PRIVATE 
     glfw
-    jsoncpp
     pthread
+    jsoncpp
     Boost::system 
     Boost::filesystem)
 
@@ -56,14 +66,14 @@ foreach(SRC_FILE ${SRC_FILES})
     message("\tFound : ${TARGET_NAME}")
 
     add_executable(${TARGET_NAME} ${SRC_FILE})
-    target_link_libraries(${TARGET_NAME} PRIVATE 
+    target_link_libraries(${TARGET_NAME} PRIVATE
+        # LIBS_JSON 
         glfw 
-        glm 
+        glm
         ADDED_LIBS
         ${PCL_LIBRARIES}
         realsense2)
     target_include_directories(${TARGET_NAME} PRIVATE
-        thirdparty/glfw/include
-    )
+        thirdparty/glfw/include)
 endforeach()
 message("")
