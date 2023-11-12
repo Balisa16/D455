@@ -1,5 +1,7 @@
 #! /bin/bash
 
+git submodule update --init --recursive
+
 build_path="build"
 
 if [ ! -d "$build_path" ]; then
@@ -7,5 +9,5 @@ if [ ! -d "$build_path" ]; then
     mkdir build
 fi
 cd build
-make -j4
+cmake .. && make -j4
 cd ..

@@ -19,7 +19,7 @@ namespace EMIRO
             data->status = TStatus::Available;
 
             // Update gyro data
-            auto motion = data->frames.as<rs2::motion_frame>();
+            // auto motion = data->frames.as<rs2::motion_frame>();
 
             /*rs2_vector gyro_data = motion.get_motion_data();
             data->euler.roll = gyro_data.z; 
@@ -123,9 +123,9 @@ namespace EMIRO
         data.cfg.enable_stream(RS2_STREAM_DEPTH, 0, 848, 480, RS2_FORMAT_Z16, 30);
 
         // data.cfg.enable_stream(RS2_STREAM_POSE, RS2_FORMAT_6DOF);
-        data.cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+        // data.cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
         
-        data.cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+        // data.cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
 
 
     	data.cfg.enable_stream(RS2_STREAM_COLOR);
@@ -173,9 +173,9 @@ namespace EMIRO
         p = data.point;
         c = data.color;
 
-        euler->roll = data.euler.roll;
+        /*euler->roll = data.euler.roll;
         euler->pitch = data.euler.pitch;
-        euler->yaw = data.euler.yaw;
+        euler->yaw = data.euler.yaw;*/
         data.lock.clear(std::memory_order_release);
     }
 
@@ -389,7 +389,7 @@ namespace EMIRO
 
         if(filename_idx > 1)
             output_file << ",\n";
-            
+
         writer->write(root, &output_file);
         filename_idx++;
 

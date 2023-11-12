@@ -16,7 +16,7 @@ int main()
 
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 
-	int cnt = 6;
+	int cnt = 3;
 	while(cnt)
 	{
 		Eigen::Vector3f p = {0.0f, 0.0f, 0.0f};
@@ -24,8 +24,6 @@ int main()
 		Quaternion quat;
 
 		dev.get_pc(pc, frame, &euler);
-
-		std::cout << "roll : " << euler.roll << ",\tpitch : " << euler.pitch << ",\tyaw : " << euler.yaw << '\n';
 
 		pc_temp.clear();
 
@@ -38,12 +36,7 @@ int main()
 		
 		dev.store_pc(&pc_temp2, &pc_main);
 
-
-		std::cout << "\nWait\n";
-
 		std::this_thread::sleep_for(std::chrono::seconds(2));
-
-		std::cout << "\nOk\n";
 
 		cnt--;
 	
