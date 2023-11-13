@@ -356,19 +356,13 @@ namespace EMIRO
         int current_size = pc.size();
         pc.width = std::ceil(current_size/(float)pc.height);
 
-        // Fill  blank data
+        // Fill blank data
         int est_data = pc.height * pc.width;
         int need_data = est_data - current_size;
+        pcl::PointXYZRGB prev_data = pc.points[current_size - 1];
         pc.points.resize(est_data);
         for(int i = 0; i < need_data; i++)
-        {
-            pc.points[current_size + i].x = 0.0f;
-            pc.points[current_size + i].y = 0.0f;
-            pc.points[current_size + i].z = 0.0f;
-            pc.points[current_size + i].r = 0;
-            pc.points[current_size + i].g = 0;
-            pc.points[current_size + i].b = 0;
-        }
+            pc.points[current_size + i] = prev_data;
 
         // Set sample position and sample quaternion
         pc.sensor_origin_ = {pos.x(), pos.y(), pos.z(), 1.0f};
