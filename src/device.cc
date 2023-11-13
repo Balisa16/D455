@@ -3,6 +3,10 @@
 
 namespace EMIRO
 {
+    void send_thread(std::shared_ptr<EMIRO::TCP> tcp_class, std::string filename)
+    {
+        tcp_class->send(filename);
+    }
 
     void frames_update(D455Data* data)
     {
@@ -159,6 +163,9 @@ namespace EMIRO
         th = std::thread(frames_update, &data);
         th.detach();
         while(data.status != TStatus::Available);
+
+        // Configure file sender
+        tcp_cl->connection("127.0.0.1", 1234);
     }
 
     void Device::get_pc(rs2::points& p, rs2::video_frame& c, Euler* euler)
@@ -401,6 +408,11 @@ namespace EMIRO
         else
             std::cout << "\033[31mPCD Export FAILED\033[0m. Status : " << ret << '\n';
         std::cout << std::string(30, ' ') << '\n';
+
+        // Sending file into GCS
+        tcp_th = std::thread(send_thread, tcp_cl, formatted_name);
+        tcp_th.detach();
+        // tcp_cl->send(formatted_name);
     }
 
     rs2::points& Device::clean_pc(rs2::points& in_points)

@@ -16,6 +16,7 @@
 #include <functional>
 #include <atomic>
 #include <stdexcept>
+#include <tcp_client.hpp>
 
 
 struct D455Data
@@ -52,6 +53,8 @@ namespace EMIRO
 {
 	void frames_update(D455Data* data);
 
+	void send_thread(std::shared_ptr<EMIRO::TCP> tcp_class, std::string filename);
+
 	typedef pcl::PointCloud<pcl::PointXYZRGB> point_cloud;
 	typedef point_cloud::Ptr cloud_pointer;
 
@@ -76,6 +79,10 @@ namespace EMIRO
 
 		// Frame thread
 		std::thread th;
+
+		// File sender
+		std::shared_ptr<EMIRO::TCP> tcp_cl = std::make_shared<EMIRO::TCP>();
+		std::thread tcp_th;
 
 	public:
 
