@@ -13,6 +13,8 @@ namespace EMIRO{
         std::string filename;
         boost::asio::io_service io_service;
         boost::asio::ip::tcp::socket socket;
+        std::string address;
+        int port;
     public:
         TCP();
         void connection(std::string address = "127.0.0.1", int port = 8888);

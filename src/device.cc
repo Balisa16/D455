@@ -3,7 +3,7 @@
 
 namespace EMIRO
 {
-    void send_thread(std::shared_ptr<EMIRO::TCP> tcp_class, std::string filename, std::shared_ptr<std::atomic_flag> lock_flag)
+    void send_thread(std::shared_ptr<EMIRO::TCP> tcp_class, std::string filename, std::atomic_flag* lock_flag)
     {
         while (lock_flag->test_and_set(std::memory_order_acquire));
         tcp_class->send(filename);
@@ -117,7 +117,8 @@ namespace EMIRO
 
     Device::Device() : 
         builder(),
-        writer(builder.newStreamWriter())
+        writer(builder.newStreamWriter()),
+        transfer_lock(ATOMIC_FLAG_INIT)
     {
         data.t_past = std::chrono::high_resolution_clock::now();
 
@@ -408,7 +409,7 @@ namespace EMIRO
         std::cout << std::string(30, ' ') << '\n';
 
         // Sending file into GCS
-        tcp_th = std::thread(send_thread, tcp_cl, pc_folder + formatted_name, transfer_lock);
+        tcp_th = std::thread(send_thread, tcp_cl, pc_folder + formatted_name, &transfer_lock);
         tcp_th.detach();
         // tcp_cl->send(formatted_name);
     }
@@ -427,7 +428,7 @@ namespace EMIRO
         output_file.close();
 
         // Make sure transfer data is done before ending the class
-        while(transfer_lock->test_and_set(std::memory_order_acquire));
-        transfer_lock->clear(std::memory_order_release);
+        while(transfer_lock.test_and_set(std::memory_order_acquire));
+        transfer_lock.clear(std::memory_order_release);
     }
 }

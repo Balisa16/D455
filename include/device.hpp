@@ -53,7 +53,7 @@ namespace EMIRO
 {
 	void frames_update(D455Data* data);
 
-	void send_thread(std::shared_ptr<EMIRO::TCP> tcp_class, std::string filename, std::shared_ptr<std::atomic_flag> lock_flag);
+	void send_thread(std::shared_ptr<EMIRO::TCP> tcp_class, std::string filename, std::atomic_flag* lock_flag);
 
 	typedef pcl::PointCloud<pcl::PointXYZRGB> point_cloud;
 	typedef point_cloud::Ptr cloud_pointer;
@@ -83,7 +83,7 @@ namespace EMIRO
 		// File sender
 		std::shared_ptr<EMIRO::TCP> tcp_cl = std::make_shared<EMIRO::TCP>();
 		std::thread tcp_th;
-		std::shared_ptr<std::atomic_flag> transfer_lock;
+		std::atomic_flag transfer_lock;
 
 	public:
 

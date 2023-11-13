@@ -16,7 +16,7 @@ int main()
 
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 
-	int cnt = 3;
+	int cnt = 4;
 	while(cnt)
 	{
 		Eigen::Vector3f p = {0.0f, 0.0f, 0.0f};
@@ -30,21 +30,33 @@ int main()
 		dev.make_pointcloud(&pc, &frame, &pc_temp);
 
 		// dev.get_orientation(&euler);
-
 		mat.transform_pc(p, euler, &pc_temp, &pc_temp2);
 		// mat.transform_pc(p, quat, &pc_temp, &pc_temp2);
-		
 		dev.store_pc(&pc_temp2, &pc_main);
+
+		if(pc_main.size > 500000)
+		{
+			pcl::PointCloud<pcl::PointXYZRGB> out_pc;
+
+			mat.convert_to_pcl(&pc_main, &out_pc);
+
+			dev.savePCD(out_pc);
+			// Remove old data
+			pc_main.clear();
+		}
 
 		std::this_thread::sleep_for(std::chrono::seconds(2));
 
 		cnt--;
-	
 	}
-	pcl::PointCloud<pcl::PointXYZRGB> out_pc;
 
-	mat.convert_to_pcl(&pc_main, &out_pc);
+	if(pc_main.size)
+	{
+		pcl::PointCloud<pcl::PointXYZRGB> out_pc;
 
-	dev.savePCD(out_pc);
+		mat.convert_to_pcl(&pc_main, &out_pc);
+
+		dev.savePCD(out_pc);
+	}
 	return 0;
 }
