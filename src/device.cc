@@ -3,9 +3,11 @@
 
 namespace EMIRO
 {
-    void send_thread(std::shared_ptr<EMIRO::TCP> tcp_class, std::string filename)
+    void send_thread(std::shared_ptr<EMIRO::TCP> tcp_class, std::string filename, std::shared_ptr<std::atomic_flag> lock_flag)
     {
+        while (lock_flag->test_and_set(std::memory_order_acquire));
         tcp_class->send(filename);
+        lock_flag->clear(std::memory_order_release);
     }
 
     void frames_update(D455Data* data)
@@ -406,7 +408,7 @@ namespace EMIRO
         std::cout << std::string(30, ' ') << '\n';
 
         // Sending file into GCS
-        tcp_th = std::thread(send_thread, tcp_cl, pc_folder + formatted_name);
+        tcp_th = std::thread(send_thread, tcp_cl, pc_folder + formatted_name, transfer_lock);
         tcp_th.detach();
         // tcp_cl->send(formatted_name);
     }
@@ -423,5 +425,9 @@ namespace EMIRO
         data.thread_en = false;
         while(data.status != TStatus::Exit);
         output_file.close();
+
+        // Make sure transfer data is done before ending the class
+        while(transfer_lock->test_and_set(std::memory_order_acquire));
+        transfer_lock->clear(std::memory_order_release);
     }
 }
