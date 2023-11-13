@@ -410,7 +410,7 @@ namespace EMIRO
         std::cout << std::string(30, ' ') << '\n';
 
         // Sending file into GCS
-        tcp_th = std::thread(send_thread, tcp_cl, formatted_name);
+        tcp_th = std::thread(send_thread, tcp_cl, pc_folder + formatted_name);
         tcp_th.detach();
         // tcp_cl->send(formatted_name);
     }
