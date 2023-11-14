@@ -3,6 +3,12 @@
 
 namespace EMIRO
 {
+    void send_thread(std::shared_ptr<EMIRO::TCP> tcp_class, std::string filename, std::atomic_flag* lock_flag)
+    {
+        while (lock_flag->test_and_set(std::memory_order_acquire));
+        tcp_class->send(filename);
+        lock_flag->clear(std::memory_order_release);
+    }
 
     void frames_update(D455Data* data)
     {
@@ -19,7 +25,7 @@ namespace EMIRO
             data->status = TStatus::Available;
 
             // Update gyro data
-            auto motion = data->frames.as<rs2::motion_frame>();
+            // auto motion = data->frames.as<rs2::motion_frame>();
 
             /*rs2_vector gyro_data = motion.get_motion_data();
             data->euler.roll = gyro_data.z; 
@@ -111,7 +117,8 @@ namespace EMIRO
 
     Device::Device() : 
         builder(),
-        writer(builder.newStreamWriter())
+        writer(builder.newStreamWriter()),
+        transfer_lock(ATOMIC_FLAG_INIT)
     {
         data.t_past = std::chrono::high_resolution_clock::now();
 
@@ -123,9 +130,9 @@ namespace EMIRO
         data.cfg.enable_stream(RS2_STREAM_DEPTH, 0, 848, 480, RS2_FORMAT_Z16, 30);
 
         // data.cfg.enable_stream(RS2_STREAM_POSE, RS2_FORMAT_6DOF);
-        data.cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+        // data.cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
         
-        data.cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+        // data.cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
 
 
     	data.cfg.enable_stream(RS2_STREAM_COLOR);
@@ -159,6 +166,9 @@ namespace EMIRO
         th = std::thread(frames_update, &data);
         th.detach();
         while(data.status != TStatus::Available);
+
+        // Configure file sender
+        tcp_cl->connection("127.0.0.1", 1234);
     }
 
     void Device::get_pc(rs2::points& p, rs2::video_frame& c, Euler* euler)
@@ -173,9 +183,9 @@ namespace EMIRO
         p = data.point;
         c = data.color;
 
-        euler->roll = data.euler.roll;
+        /*euler->roll = data.euler.roll;
         euler->pitch = data.euler.pitch;
-        euler->yaw = data.euler.yaw;
+        euler->yaw = data.euler.yaw;*/
         data.lock.clear(std::memory_order_release);
     }
 
@@ -349,18 +359,14 @@ namespace EMIRO
         int current_size = pc.size();
         pc.width = std::ceil(current_size/(float)pc.height);
 
-        // Fill  blank data
+        // Fill blank data
         int est_data = pc.height * pc.width;
         int need_data = est_data - current_size;
         pc.points.resize(est_data);
         for(int i = 0; i < need_data; i++)
         {
-            pc.points[current_size + i].x = 0.0f;
-            pc.points[current_size + i].y = 0.0f;
-            pc.points[current_size + i].z = 0.0f;
-            pc.points[current_size + i].r = 0;
-            pc.points[current_size + i].g = 0;
-            pc.points[current_size + i].b = 0;
+            int pos = current_size + i;
+            pc.points[pos] = pc.points[pos - pc.height];
         }
 
         // Set sample position and sample quaternion
@@ -386,8 +392,10 @@ namespace EMIRO
         root["qx"] = quat.x;
         root["qy"] = quat.y;
         root["qz"] = quat.z;
+
         if(filename_idx > 1)
             output_file << ",\n";
+
         writer->write(root, &output_file);
         filename_idx++;
 
@@ -399,6 +407,11 @@ namespace EMIRO
         else
             std::cout << "\033[31mPCD Export FAILED\033[0m. Status : " << ret << '\n';
         std::cout << std::string(30, ' ') << '\n';
+
+        // Sending file into GCS
+        tcp_th = std::thread(send_thread, tcp_cl, pc_folder + formatted_name, &transfer_lock);
+        tcp_th.detach();
+        // tcp_cl->send(formatted_name);
     }
 
     rs2::points& Device::clean_pc(rs2::points& in_points)
@@ -413,5 +426,9 @@ namespace EMIRO
         data.thread_en = false;
         while(data.status != TStatus::Exit);
         output_file.close();
+
+        // Make sure transfer data is done before ending the class
+        while(transfer_lock.test_and_set(std::memory_order_acquire));
+        transfer_lock.clear(std::memory_order_release);
     }
 }

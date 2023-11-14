@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.0)
 
 project(D455Sample)
 
@@ -36,6 +36,7 @@ include_directories(
 
 add_library(ADDED_LIBS STATIC
     src/callback.cc
+    src/tcp_client.cc
     src/window.cc
     src/device.cc
     src/shader.cc
