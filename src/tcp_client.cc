@@ -16,7 +16,7 @@ namespace EMIRO{
 
     void TCP::send(std::string filename)
     {
-        socket.connect(boost::asio::ip::tcp::endpoint( boost::asio::ip::address::from_string(address), port ));
+        // socket.connect(boost::asio::ip::tcp::endpoint( boost::asio::ip::address::from_string(address), port ));
         std::ifstream file(filename, std::ios::binary);
         std::string buff_string;
 
