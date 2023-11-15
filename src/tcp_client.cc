@@ -4,19 +4,21 @@ namespace EMIRO{
     TCP::TCP() :
         socket(io_service)
     {
-
+        address = "127.0.0.1";
+        port = 8888;
     }
 
     void TCP::connection(std::string address, int port)
     {
         this->address = address;
         this->port = port;
-        socket.connect(boost::asio::ip::tcp::endpoint( boost::asio::ip::address::from_string(address), port ));
     }
 
     void TCP::send(std::string filename)
     {
-        // socket.connect(boost::asio::ip::tcp::endpoint( boost::asio::ip::address::from_string(address), port ));
+        socket.connect( boost::asio::ip::tcp::endpoint( boost::asio::ip::address::from_string(address), port ));
+        
+        std::cout << "Send : " << filename << '\n';
         std::ifstream file(filename, std::ios::binary);
         std::string buff_string;
 
@@ -25,14 +27,20 @@ namespace EMIRO{
             return;
         }
 
-        uint64_t line_cnt = 0;
         while (std::getline(file, buff_string)) {
+            buff_string += '\n';
             boost::system::error_code ec;
-            socket.write_some(boost::asio::buffer(buff_string.c_str(), sizeof(buff_string.c_str())), ec);
-            line_cnt++;
+            const char* buf_char = buff_string.c_str();
+            size_t length = buff_string.length();
+            socket.write_some(boost::asio::buffer(buf_char, length), ec);
         }
+
+        socket.close();
         file.close();
-        std::cout << "Sending " << line_cnt << " line.\n";
+        std::cout << "Send file successfully";
+        for (int i = 0; i < 40; i++) std::cout << " ";
+        std::cout << '\n';
+        
     }
 
     TCP::~TCP()

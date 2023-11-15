@@ -168,7 +168,7 @@ namespace EMIRO
         while(data.status != TStatus::Available);
 
         // Configure file sender
-        tcp_cl->connection("127.0.0.1", 1234);
+        tcp_cl->connection("127.0.0.1", 8888);
     }
 
     void Device::get_pc(rs2::points& p, rs2::video_frame& c, Euler* euler)
