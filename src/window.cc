@@ -15,9 +15,12 @@ const char *fragmentShaderSource = "#version 330 core\n"
     "}\n\0";
 */
 
+#ifndef POSITION_HEADER
+#define POSITION_HEADER
 struct Position{
     float x, y, z;
 };
+#endif
 
 struct TexCoord{
     float s, t;

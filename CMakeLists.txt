@@ -40,6 +40,7 @@ add_library(ADDED_LIBS STATIC
     src/window.cc
     src/device.cc
     src/shader.cc
+    src/UART.cc
     src/mat.cc
     src/glad.c
     src/stb_image.cc)
