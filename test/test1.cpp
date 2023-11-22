@@ -9,7 +9,7 @@ int main()
 	EMIRO::UART uart;
 	
 	// Initialize UART communication
-	uart.init("/dev/ttyTHS1", b9600);
+	uart.init("/dev/ttyTHS1", B9600);
 
 	int counter = 5;
 	rs2::points pc;
@@ -29,7 +29,7 @@ int main()
 		EMIRO::Position curr_pos;
 		EMIRO::Quaternion curr_quat;
 
-		if(uart.read_pose(&curr_pose, &curr_quat))
+		if(uart.read_pose(&curr_pos, &curr_quat))
 		{
 			Eigen::Vector3f p = {0.0f, 0.0f, 0.0f};
 			Euler euler = {0.0f, cnt * 90.0f, 0.0f};
@@ -57,15 +57,15 @@ int main()
 				pc_main.clear();
 			}
 
-			std::this_thread::sleep_for(std::chrono::seconds(2));
+			// std::this_thread::sleep_for(std::chrono::seconds(2));
 
 			cnt--;
 		}
 		else
 			std::cout << "Invalid data from master\n";
-
-		
 	}
+	
+	std::cout << "End of System\n";
 
 	if(pc_main.size)
 	{
