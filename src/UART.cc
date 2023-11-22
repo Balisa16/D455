@@ -121,9 +121,8 @@ namespace EMIRO
                 }
                 cnt++;
             }
-        }catch(std::exception& ex){
-		std::cout << "Error : " << ex.what() << "\nReceive : " << buffer << '\n';
-        }
+        }catch(std::exception& ex) return false;
+
         if(cnt < 6)
 		std::cerr << "Invalid data. Found " << cnt << " data\n";
 	else
