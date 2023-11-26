@@ -10,15 +10,15 @@
 
 namespace EMIRO
 {
-#ifndef POSITION_HEADER
-#define  POSITION_HEADER
+#ifndef POSITION_STRUCT
+#define  POSITION_STRUCT
     typedef struct{
         float x, y, z;
     }Position;
 #endif
 
-#ifndef QUATERNION_HEADER
-#define QUATERNION_HEADER
+#ifndef QUATERNION_STRUCT
+#define QUATERNION_STRUCT
     typedef struct{
         float w, x, y, z;
     }Quaternion;
