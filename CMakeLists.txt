@@ -14,6 +14,7 @@ add_subdirectory(thirdparty/glfw)
 add_subdirectory(thirdparty/glm)
 add_subdirectory(thirdparty/librealsense)
 add_subdirectory(thirdparty/jsoncpp)
+add_subdirectory(thirdparty/gtest)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(DEPENDENCIES realsense2)
@@ -53,15 +54,16 @@ target_link_libraries(ADDED_LIBS PRIVATE
     Boost::system 
     Boost::filesystem)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/release)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/release/test)
 
+# Build unit tests
 file(GLOB SRC_FILES test/*.cpp)
-message("\nDetect target")
+message("\nDetect TEST")
 foreach(SRC_FILE ${SRC_FILES})
     get_filename_component(TARGET_NAME ${SRC_FILE} NAME_WE)
 
     message("\tFound : ${TARGET_NAME}")
-
+    
     add_executable(${TARGET_NAME} ${SRC_FILE})
     target_link_libraries(${TARGET_NAME} PRIVATE
         glfw 
@@ -69,6 +71,23 @@ foreach(SRC_FILE ${SRC_FILES})
         ADDED_LIBS
         ${PCL_LIBRARIES}
         realsense2)
+    target_include_directories(${TARGET_NAME} PRIVATE
+        thirdparty/glfw/include)
+endforeach()
+    
+# Build unit tests
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/release/unit_test)
+file(GLOB SRC_FILES unit_test/*.cpp)
+message("\nDetect UNIT TEST")
+foreach(SRC_FILE ${SRC_FILES})
+    get_filename_component(TARGET_NAME ${SRC_FILE} NAME_WE)
+
+    message("\tFound : ${TARGET_NAME}")
+
+    add_executable(${TARGET_NAME} ${SRC_FILE})
+    target_link_libraries(${TARGET_NAME} PRIVATE
+        ADDED_LIBS
+        gtest)
     target_include_directories(${TARGET_NAME} PRIVATE
         thirdparty/glfw/include)
 endforeach()
