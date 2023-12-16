@@ -9,30 +9,21 @@ endif()
 
 find_package(PCL REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system filesystem)
-find_package(jsoncpp REQUIRED)
 
-# add_subdirectory(thirdparty/jsoncpp)
 add_subdirectory(thirdparty/glfw)
 add_subdirectory(thirdparty/glm)
 add_subdirectory(thirdparty/librealsense)
+add_subdirectory(thirdparty/jsoncpp)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(DEPENDENCIES realsense2)
 
 include_directories(
-    thirdparty/jsoncpp/include
     ${PCL_INCLUDE_DIRS}
     thirdparty/glfw/include
     thirdparty/glm/glm
     thirdparty/librealsense/include
     ${PROJECT_SOURCE_DIR}/include)
-
-# add_library(LIBS_JSON STATIC
-# thirdparty/jsoncpp/src/lib_json/json_reader.cpp
-# thirdparty/jsoncpp/src/lib_json/json_value.cpp
-# thirdparty/jsoncpp/src/lib_json/json_writer.cpp
-# thirdparty/jsoncpp/src/jsontestrunner/main.cpp
-# )
 
 add_library(ADDED_LIBS STATIC
     src/callback.cc
@@ -43,7 +34,11 @@ add_library(ADDED_LIBS STATIC
     src/UART.cc
     src/mat.cc
     src/glad.c
-    src/stb_image.cc)
+    src/stb_image.cc
+    thirdparty/jsoncpp/src/lib_json/json_reader.cpp
+    thirdparty/jsoncpp/src/lib_json/json_value.cpp
+    thirdparty/jsoncpp/src/lib_json/json_writer.cpp
+    thirdparty/jsoncpp/src/jsontestrunner/main.cpp)
 
 link_directories(
     ${PCL_LIBRARY_DIRS}
@@ -69,7 +64,6 @@ foreach(SRC_FILE ${SRC_FILES})
 
     add_executable(${TARGET_NAME} ${SRC_FILE})
     target_link_libraries(${TARGET_NAME} PRIVATE
-        # LIBS_JSON 
         glfw 
         glm
         ADDED_LIBS
