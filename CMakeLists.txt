@@ -24,6 +24,7 @@ include_directories(
     thirdparty/glfw/include
     thirdparty/glm/glm
     thirdparty/librealsense/include
+    thirdparty/jsoncpp/include
     ${PROJECT_SOURCE_DIR}/include)
 
 add_library(ADDED_LIBS STATIC
@@ -35,15 +36,11 @@ add_library(ADDED_LIBS STATIC
     src/UART.cc
     src/mat.cc
     src/glad.c
-    src/stb_image.cc
-    thirdparty/jsoncpp/src/lib_json/json_reader.cpp
-    thirdparty/jsoncpp/src/lib_json/json_value.cpp
-    thirdparty/jsoncpp/src/lib_json/json_writer.cpp
-    thirdparty/jsoncpp/src/jsontestrunner/main.cpp)
+    src/stb_image.cc)
 
 link_directories(
     ${PCL_LIBRARY_DIRS}
-    thirdparty/jsoncpp/build/lib
+    # thirdparty/jsoncpp/build/lib
 )
 add_definitions(${PCL_DEFINITIONS})
 
@@ -68,6 +65,7 @@ foreach(SRC_FILE ${SRC_FILES})
     target_link_libraries(${TARGET_NAME} PRIVATE
         glfw 
         glm
+        jsoncpp
         ADDED_LIBS
         ${PCL_LIBRARIES}
         realsense2)

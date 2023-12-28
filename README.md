@@ -16,6 +16,7 @@ sudo make install
 git clone https://github.com/Balisa16/D455.git
 cd D455
 git submodule update --init --recursive
+./prebuild.sh
 mkdir build && cd build
-cmake .. && make -j4 
+cmake .. && make -j$(( $(nproc) - 1 ))
 ```

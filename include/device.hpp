@@ -1,9 +1,10 @@
 #ifndef DEVICE_HPP
 #define DEVICE_HPP
 
+#include <values.h>
+#include <json.hpp>
 #include <librealsense2/rs.hpp>
 #include <boost/filesystem.hpp>
-#include <json/json.h>
 #include <mat.hpp>
 #include <unistd.h>
 #include <iostream>
