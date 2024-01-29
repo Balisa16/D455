@@ -40,7 +40,10 @@ int main()
 
 			mat.convert_to_pcl(&pc_main, &out_pc);
 
-			std::string file_path = dev.savePCD(out_pc);
+			std::string pcd_path = dev.savePCD(out_pc);
+
+			dev.sendPCD(pcd_path);
+
 			// Remove old data
 			pc_main.clear();
 		}
