@@ -42,7 +42,7 @@ int main()
 
 			std::string pcd_path = dev.savePCD(out_pc);
 
-			dev.sendPCD(pcd_path);
+			// dev.sendPCD(pcd_path);
 
 			// Remove old data
 			pc_main.clear();
@@ -60,6 +60,8 @@ int main()
 		mat.convert_to_pcl(&pc_main, &out_pc);
 
 		dev.savePCD(out_pc);
+
+		// dev.sendPCD(pcd_path);
 	}
 	return 0;
 }
