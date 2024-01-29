@@ -1,25 +1,26 @@
 #include <device.hpp>
 
-
 namespace EMIRO
 {
-    void send_thread(std::shared_ptr<EMIRO::TCP> tcp_class, std::string filename, std::atomic_flag* lock_flag)
+    void send_thread(std::shared_ptr<EMIRO::TCP> tcp_class, std::string filename, std::atomic_flag *lock_flag)
     {
-        while (lock_flag->test_and_set(std::memory_order_acquire));
+        while (lock_flag->test_and_set(std::memory_order_acquire))
+            ;
         tcp_class->send(filename);
         lock_flag->clear(std::memory_order_release);
     }
 
-    void frames_update(D455Data* data)
+    void frames_update(D455Data *data)
     {
         data->status = TStatus::Init;
         std::thread::id th_id = std::this_thread::get_id();
         float maks_fps = 40.0f;
         std::cout << std::fixed << std::setprecision(2);
 
-        while(data->thread_en)
+        while (data->thread_en)
         {
-            while (data->lock.test_and_set(std::memory_order_acquire));
+            while (data->lock.test_and_set(std::memory_order_acquire))
+                ;
 
             data->frames = data->pipe.wait_for_frames();
             data->status = TStatus::Available;
@@ -28,7 +29,7 @@ namespace EMIRO
             // auto motion = data->frames.as<rs2::motion_frame>();
 
             /*rs2_vector gyro_data = motion.get_motion_data();
-            data->euler.roll = gyro_data.z; 
+            data->euler.roll = gyro_data.z;
             data->euler.pitch = gyro_data.x;
             data->euler.yaw = gyro_data.y;*/
 
@@ -40,22 +41,23 @@ namespace EMIRO
             data->t_past = data->t_now;
             float _fps = 1000000 / (float)duration.count();
 
-            if(_fps > maks_fps) _fps = maks_fps;
+            if (_fps > maks_fps)
+                _fps = maks_fps;
 
             std::cout << "\033[1mFPS : [";
 
             // Bar color
-            if((_fps/(float)maks_fps) < 0.3f)
+            if ((_fps / (float)maks_fps) < 0.3f)
                 std::cout << "\033[31m";
-            else if((_fps/(float)maks_fps) > 0.7f)
+            else if ((_fps / (float)maks_fps) > 0.7f)
                 std::cout << "\033[32m";
             else
                 std::cout << "\033[33m";
 
-            float _div = maks_fps/30.0f;
-            for(float j = 0.f; j <= _fps; j += _div)
+            float _div = maks_fps / 30.0f;
+            for (float j = 0.f; j <= _fps; j += _div)
                 std::cout << "▇";
-            for(float j = _fps+.001f; j <= maks_fps; j += _div)
+            for (float j = _fps + .001f; j <= maks_fps; j += _div)
                 std::cout << " ";
 
             std::cout << ' ' << _fps << '/' << maks_fps << "\033[0m]     \r";
@@ -67,21 +69,21 @@ namespace EMIRO
 
     void Device::progress_bar(int i, int maks)
     {
-        if((i/(float)maks) < 0.3f)
+        if ((i / (float)maks) < 0.3f)
             std::cout << "\033[31m";
-        else if((i/(float)maks) > 0.7f)
+        else if ((i / (float)maks) > 0.7f)
             std::cout << "\033[32m";
         else
             std::cout << "\033[33m";
 
-        float _div = maks/30.0f;
-        for(int j = 0; j <= i; j += _div)
+        float _div = maks / 30.0f;
+        for (int j = 0; j <= i; j += _div)
             std::cout << "▇";
-        for(int j = i+1; j <= maks; j += _div)
+        for (int j = i + 1; j <= maks; j += _div)
             std::cout << " ";
 
-        std::cout << "\033[0m] " << (int)(i*100/maks);
-        if(i < maks)
+        std::cout << "\033[0m] " << (int)(i * 100 / maks);
+        if (i < maks)
             std::cout << "%  \r";
         else
             std::cout << "% \033[32m[OK]\033[0m\n";
@@ -115,27 +117,25 @@ namespace EMIRO
         return found_gyro && found_accel;
     }
 
-    Device::Device() : 
-        builder(),
-        writer(builder.newStreamWriter()),
-        transfer_lock(ATOMIC_FLAG_INIT)
+    Device::Device() : builder(),
+                       writer(builder.newStreamWriter()),
+                       transfer_lock(ATOMIC_FLAG_INIT)
     {
         data.t_past = std::chrono::high_resolution_clock::now();
 
         check_dir();
 
-        if(!check_imu())
+        if (!check_imu())
             throw std::runtime_error("\033[31mIMU is not Support\033[0m");
 
         data.cfg.enable_stream(RS2_STREAM_DEPTH, 0, 848, 480, RS2_FORMAT_Z16, 30);
 
         // data.cfg.enable_stream(RS2_STREAM_POSE, RS2_FORMAT_6DOF);
         // data.cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
-        
+
         // data.cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
 
-
-    	data.cfg.enable_stream(RS2_STREAM_COLOR);
+        data.cfg.enable_stream(RS2_STREAM_COLOR);
         // cfg.enable_stream(RS2_STREAM_INFRARED);
         // cfg.enable_stream(RS2_STREAM_DEPTH);
 
@@ -165,15 +165,17 @@ namespace EMIRO
         // Take first
         th = std::thread(frames_update, &data);
         th.detach();
-        while(data.status != TStatus::Available);
+        while (data.status != TStatus::Available)
+            ;
 
         // Configure file sender
         tcp_cl->connection("127.0.0.1", 8888);
     }
 
-    void Device::get_pc(rs2::points& p, rs2::video_frame& c, Euler* euler)
+    void Device::get_pc(rs2::points &p, rs2::video_frame &c, Euler *euler)
     {
-        while (data.lock.test_and_set(std::memory_order_acquire));
+        while (data.lock.test_and_set(std::memory_order_acquire))
+            ;
         data.color = data.frames.get_color_frame();
         if (!data.color)
             data.color = data.frames.get_infrared_frame();
@@ -199,30 +201,29 @@ namespace EMIRO
 
         for (int i = 0; i < f.size(); ++i)
         {
-            if(!boost::filesystem::exists(f[i]))
-                if(!boost::filesystem::create_directory(f[i]))
+            if (!boost::filesystem::exists(f[i]))
+                if (!boost::filesystem::create_directory(f[i]))
                 {
                     std::cout << "Failed create " << f[i] << '\n';
                     throw;
                 }
         }
 
-
         // Check poitcloud folder
         int pc_folder_idx = 0;
-        while(true)
+        while (true)
         {
             bool en = false, empty = true;
-            for (const boost::filesystem::directory_entry& entry : boost::filesystem::directory_iterator(out_folder + "/pointcloud")) {
+            for (const boost::filesystem::directory_entry &entry : boost::filesystem::directory_iterator(out_folder + "/pointcloud"))
+            {
                 empty = false;
                 if (boost::filesystem::is_directory(entry.path()) && std::atoi(entry.path().filename().string().c_str()) == pc_folder_idx)
                 {
                     en = true;
                     break;
                 }
-                    
             }
-            if(!en || empty)
+            if (!en || empty)
                 break;
             pc_folder_idx++;
         }
@@ -230,41 +231,42 @@ namespace EMIRO
         boost::filesystem::create_directory(out_folder + "/pointcloud/" + std::to_string(pc_folder_idx));
 
         pc_folder = out_folder + "/pointcloud/" + std::to_string(pc_folder_idx) + '/';
-        std::cout << "Pointcloud output in " <<  pc_folder << '\n';
+        std::cout << "Pointcloud output in " << pc_folder << '\n';
 
         // Check folder for pointcloud
         output_file.open(out_folder + "/resume/resume" + std::to_string(pc_folder_idx) + ".json");
-        if(!output_file.is_open())throw;
+        if (!output_file.is_open())
+            throw;
     }
 
-    void Device::RGB_Texture(rs2::video_frame& texture, rs2::texture_coordinate Texture_XY, Color& out_RGB)
+    void Device::RGB_Texture(rs2::video_frame &texture, rs2::texture_coordinate Texture_XY, Color &out_RGB)
     {
-        int width  = texture.get_width();
+        int width = texture.get_width();
         int height = texture.get_height();
- 
-        int x_value = std::min(std::max(int(Texture_XY.u * width  + .5f), 0), width - 1);
+
+        int x_value = std::min(std::max(int(Texture_XY.u * width + .5f), 0), width - 1);
         int y_value = std::min(std::max(int(Texture_XY.v * height + .5f), 0), height - 1);
 
         int bytes = x_value * texture.get_bytes_per_pixel();
         int strides = y_value * texture.get_stride_in_bytes();
-        int Text_Index =  (bytes + strides);
+        int Text_Index = (bytes + strides);
 
-        const auto New_Texture = reinterpret_cast<const uint8_t*>(texture.get_data());
-        
+        const auto New_Texture = reinterpret_cast<const uint8_t *>(texture.get_data());
+
         // RGB components to save in tuple
         out_RGB.b = New_Texture[Text_Index];
         out_RGB.g = New_Texture[Text_Index + 1];
         out_RGB.r = New_Texture[Text_Index + 2];
     }
 
-    void Device::convert_to_PCL(rs2::points& in_points, rs2::video_frame& in_color, pcl::PointCloud<pcl::PointXYZRGB>& output, float depth_lim)
+    void Device::convert_to_PCL(rs2::points &in_points, rs2::video_frame &in_color, pcl::PointCloud<pcl::PointXYZRGB> &output, float depth_lim)
     {
         auto sp = in_points.get_profile().as<rs2::video_stream_profile>();
-        
-        output.width  = static_cast<uint32_t>( sp.width()  );   
-        output.height = static_cast<uint32_t>( sp.height() );
+
+        output.width = static_cast<uint32_t>(sp.width());
+        output.height = static_cast<uint32_t>(sp.height());
         output.is_dense = false;
-        output.points.resize( in_points.size() );
+        output.points.resize(in_points.size());
 
         auto Texture_Coord = in_points.get_texture_coordinates();
         auto Vertex = in_points.get_vertices();
@@ -272,13 +274,14 @@ namespace EMIRO
         Color temp_rgb;
         for (int i = 0; i < in_points.size(); i++)
         {
-            if(Vertex[i].x > 5.0f || 
+            if (Vertex[i].x > 5.0f ||
                 Vertex[i].y > 5.0f ||
-                Vertex[i].z > 5.0f) continue;
+                Vertex[i].z > 5.0f)
+                continue;
             output.points[i].x = Vertex[i].x;
             output.points[i].y = Vertex[i].y;
             output.points[i].z = Vertex[i].z < depth_lim ? Vertex[i].z : depth_lim;
-            
+
             RGB_Texture(in_color, Texture_Coord[i], temp_rgb);
 
             output.points[i].r = temp_rgb.r;
@@ -287,7 +290,7 @@ namespace EMIRO
         }
     }
 
-    void Device::make_pointcloud(rs2::points* in_points, rs2::video_frame* in_color, PointCloud* pc)
+    void Device::make_pointcloud(rs2::points *in_points, rs2::video_frame *in_color, PointCloud *pc)
     {
         // Remove temporary data
         pc->position.clear();
@@ -297,16 +300,16 @@ namespace EMIRO
         auto sp = in_points->get_profile().as<rs2::video_stream_profile>();
         pc->height = sp.height();
 
-        const rs2::texture_coordinate* texcoord = in_points->get_texture_coordinates();
-        const rs2::vertex* vert = in_points->get_vertices();
+        const rs2::texture_coordinate *texcoord = in_points->get_texture_coordinates();
+        const rs2::vertex *vert = in_points->get_vertices();
 
         Color temp_rgb;
         for (int i = 0; i < in_points->size(); i++)
         {
             // Filter data
-            if(std::abs(vert[i].x) > 5.0f || std::abs(vert[i].x) < 0.01f)
+            if (std::abs(vert[i].x) > 5.0f || std::abs(vert[i].x) < 0.01f)
                 continue;
-            
+
             // Get match color
             RGB_Texture(*in_color, texcoord[i], temp_rgb);
 
@@ -315,10 +318,10 @@ namespace EMIRO
                 {vert[i].x, vert[i].y, vert[i].z},
                 {temp_rgb.r, temp_rgb.g, temp_rgb.b});
         }
-        pc->width = std::ceil(pc->size/(float)pc->height);
+        pc->width = std::ceil(pc->size / (float)pc->height);
     }
 
-    void Device::store_pc(PointCloud* src, PointCloud *dest)
+    void Device::store_pc(PointCloud *src, PointCloud *dest)
     {
         dest->width = src->width;
         dest->height = src->height;
@@ -326,16 +329,16 @@ namespace EMIRO
         (*dest) += (*src);
     }
 
-    void Device::get_orientation(Euler* euler)
+    void Device::get_orientation(Euler *euler)
     {
         auto motion = data.frames.as<rs2::motion_frame>();
 
-        if (motion && motion.get_profile().stream_type() == RS2_STREAM_GYRO && 
+        if (motion && motion.get_profile().stream_type() == RS2_STREAM_GYRO &&
             motion.get_profile().format() == RS2_FORMAT_MOTION_XYZ32F)
         {
             rs2_vector gyro_data = motion.get_motion_data();
-            
-            euler->roll = gyro_data.z; 
+
+            euler->roll = gyro_data.z;
             euler->pitch = gyro_data.x;
             euler->yaw = gyro_data.y;
         }
@@ -343,7 +346,7 @@ namespace EMIRO
             std::cout << "Failed update orientation\n";
     }
 
-    void Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB>& pc, Eigen::Vector3f pos, Quaternion quat, std::string file_name)
+    std::string Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB> &pc, Eigen::Vector3f pos, Quaternion quat, std::string file_name)
     {
         /*int w_ratio = 848, h_ratio = 480;
         float ratio = h_ratio / (float) w_ratio;
@@ -357,13 +360,13 @@ namespace EMIRO
         }*/
 
         int current_size = pc.size();
-        pc.width = std::ceil(current_size/(float)pc.height);
+        pc.width = std::ceil(current_size / (float)pc.height);
 
         // Fill blank data
         int est_data = pc.height * pc.width;
         int need_data = est_data - current_size;
         pc.points.resize(est_data);
-        for(int i = 0; i < need_data; i++)
+        for (int i = 0; i < need_data; i++)
         {
             int pos = current_size + i;
             pc.points[pos] = pc.points[pos - pc.height];
@@ -393,28 +396,31 @@ namespace EMIRO
         root["qy"] = quat.y;
         root["qz"] = quat.z;
 
-        if(filename_idx > 1)
+        if (filename_idx > 1)
             output_file << ",\n";
 
         writer->write(root, &output_file);
         filename_idx++;
 
-    	int ret = pcl::io::savePCDFile((pc_folder + formatted_name).c_str(), pc);
-        
+        std::string pcd_path = pc_folder + formatted_name;
+        int ret = pcl::io::savePCDFile(pcd_path.c_str(), pc);
 
-        if(ret == 0)
+        if (ret == 0)
             std::cout << "\033[32mSaved " << formatted_name << "\033[0m";
         else
             std::cout << "\033[31mPCD Export FAILED\033[0m. Status : " << ret << '\n';
         std::cout << std::string(30, ' ') << '\n';
-
-        // Sending file into GCS
-        tcp_th = std::thread(send_thread, tcp_cl, pc_folder + formatted_name, &transfer_lock);
-        tcp_th.detach();
-        // tcp_cl->send(formatted_name);
+        return pcd_path;
     }
 
-    rs2::points& Device::clean_pc(rs2::points& in_points)
+    void Device::sendPCD(std::string file_path)
+    {
+        // Sending file into GCS
+        tcp_th = std::thread(send_thread, tcp_cl, file_path, &transfer_lock);
+        tcp_th.detach();
+    }
+
+    rs2::points &Device::clean_pc(rs2::points &in_points)
     {
         rs2::points out_pc;
 
@@ -424,11 +430,13 @@ namespace EMIRO
     Device::~Device()
     {
         data.thread_en = false;
-        while(data.status != TStatus::Exit);
+        while (data.status != TStatus::Exit)
+            ;
         output_file.close();
 
         // Make sure transfer data is done before ending the class
-        while(transfer_lock.test_and_set(std::memory_order_acquire));
+        while (transfer_lock.test_and_set(std::memory_order_acquire))
+            ;
         transfer_lock.clear(std::memory_order_release);
     }
 }

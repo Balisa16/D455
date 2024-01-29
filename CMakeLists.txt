@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.10)
 
-project(D455Sample)
+project(D455Sample VERSION 1.0.0)
 
 if(NOT CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 14)
@@ -27,7 +27,7 @@ include_directories(
     thirdparty/jsoncpp/include
     ${PROJECT_SOURCE_DIR}/include)
 
-add_library(ADDED_LIBS STATIC
+add_library(${PROJECT_NAME} STATIC
     src/callback.cc
     src/tcp_client.cc
     src/window.cc
@@ -44,7 +44,7 @@ link_directories(
 )
 add_definitions(${PCL_DEFINITIONS})
 
-target_link_libraries(ADDED_LIBS PRIVATE 
+target_link_libraries(${PROJECT_NAME} PRIVATE 
     glfw
     pthread
     jsoncpp
@@ -66,7 +66,7 @@ foreach(SRC_FILE ${SRC_FILES})
         glfw 
         glm
         jsoncpp
-        ADDED_LIBS
+        ${PROJECT_NAME}
         ${PCL_LIBRARIES}
         realsense2)
     target_include_directories(${TARGET_NAME} PRIVATE
@@ -84,7 +84,7 @@ foreach(SRC_FILE ${SRC_FILES})
 
     add_executable(${TARGET_NAME} ${SRC_FILE})
     target_link_libraries(${TARGET_NAME} PRIVATE
-        ADDED_LIBS
+        ${PROJECT_NAME}
         gtest)
     target_include_directories(${TARGET_NAME} PRIVATE
         thirdparty/glfw/include)
