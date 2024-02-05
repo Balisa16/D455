@@ -2,6 +2,12 @@
 
 Sampling code for D455 Camera Sampling System
 
+## Requirements
+1. Ubuntu >= 18.04
+2. CMake >= 3.13 (development test in 3.27.9)
+This program works well in Jetson Nano-Ubuntu 18 with upgraded CMake version aarch.
+ 
+
 ## Dependencies
 ```
 git clone https://github.com/IntelRealSense/librealsense.git
@@ -9,6 +15,10 @@ cd librealsense
 mkdir build && cd build
 cmake .. && make -j4
 sudo make install
+```
+### Other
+```
+sudo apt -y install libpcl-dev libxinerama-dev libxcursor-dev
 ```
 
 ## Build
