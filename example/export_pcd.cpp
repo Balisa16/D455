@@ -34,9 +34,9 @@ int main()
 		dev.make_pointcloud(&pc, &frame, &pc_temp);
 
 		// dev.get_orientation(&euler);
-		mat.transform_pc(p, euler, &pc_temp, &pc_temp2);
+		// mat.transform_pc(p, euler, &pc_temp, &pc_temp2);
 		// mat.transform_pc(p, quat, &pc_temp, &pc_temp2);
-		dev.store_pc(&pc_temp2, &pc_main);
+		dev.store_pc(&pc_temp, &pc_main);
 
 		if (pc_main.size > 500000)
 		{
@@ -61,11 +61,13 @@ int main()
 
 	if (pc_main.size)
 	{
+		Eigen::Vector3f p = {0.0f, 5.0f, 0.0f};
+		Eigen::Quaternionf q = {0.707f, 0.707f, 0.0f, 0.0f};
 		pcl::PointCloud<pcl::PointXYZRGB> out_pc;
 
 		mat.convert_to_pcl(&pc_main, &out_pc);
 
-		dev.savePCD(out_pc);
+		PCDWriter::write("output", out_pc, p, q);
 
 		// dev.sendPCD(pcd_path);
 	}
