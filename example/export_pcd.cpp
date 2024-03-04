@@ -1,5 +1,6 @@
 #include <mat.hpp>
 #include <device.hpp>
+#include <writer_pcd.hpp>
 
 int main()
 {
@@ -17,9 +18,12 @@ int main()
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 
 	int cnt = 8;
+
+	PCDWriter::set_folder("pc");
 	while (cnt)
 	{
-		Eigen::Vector3f p = {0.0f, 0.0f, 0.0f};
+		Eigen::Vector3f p = {0.0f, 5.0f, 0.0f};
+		Eigen::Quaternionf q = {0.707f, 0.707f, 0.0f, 0.0f};
 		Euler euler = {0.0f, cnt * 90.0f, 0.0f};
 		Quaternion quat;
 
@@ -40,7 +44,9 @@ int main()
 
 			mat.convert_to_pcl(&pc_main, &out_pc);
 
-			std::string pcd_path = dev.savePCD(out_pc);
+			PCDWriter::write("output", out_pc, p, q);
+
+			// std::string pcd_path = dev.savePCD(out_pc);
 
 			// dev.sendPCD(pcd_path);
 

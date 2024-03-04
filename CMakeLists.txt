@@ -29,6 +29,7 @@ include_directories(
 
 add_library(${PROJECT_NAME} STATIC
     src/callback.cc
+    src/writer_pcd.cc
     src/tcp_client.cc
     src/window.cc
     src/device.cc
@@ -42,6 +43,7 @@ link_directories(
     ${PCL_LIBRARY_DIRS}
     # thirdparty/jsoncpp/build/lib
 )
+
 add_definitions(${PCL_DEFINITIONS})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
