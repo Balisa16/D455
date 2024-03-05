@@ -20,8 +20,15 @@ std::string PCDWriter::Iwrite(std::string &filename, pcl::PointCloud<pcl::PointX
     cloud.sensor_orientation_ = {orientation.w(), orientation.x(), orientation.y(), orientation.z()};
 
     std::string formatted_name = filename + std::to_string(file_index) + ".pcd";
-
     std::string pcd_path = folder_path + '/' + formatted_name;
+
+    while (boost::filesystem::exists(pcd_path))
+    {
+        file_index++;
+        formatted_name = filename + std::to_string(file_index) + ".pcd";
+        pcd_path = folder_path + '/' + formatted_name;
+    }
+
     int ret = pcl::io::savePCDFile(pcd_path.c_str(), cloud);
 
     if (ret == 0)

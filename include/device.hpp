@@ -2,7 +2,6 @@
 #define DEVICE_HPP
 
 #include <values.h>
-#include <json.hpp>
 #include <librealsense2/rs.hpp>
 #include <boost/filesystem.hpp>
 #include <mat.hpp>
@@ -69,12 +68,6 @@ namespace EMIRO
 		void check_dir(std::string folder = "../output");
 		void RGB_Texture(rs2::video_frame &texture, rs2::texture_coordinate Texture_XY, Color &out_RGB);
 		void progress_bar(int i, int maks = 100);
-
-		// JSON Writer
-		Json::Value root;
-		Json::StreamWriterBuilder builder;
-		std::unique_ptr<Json::StreamWriter> writer;
-		std::ofstream output_file;
 
 		// Frame thread
 		std::thread th;

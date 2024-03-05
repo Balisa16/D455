@@ -6,6 +6,9 @@ foreach(SRC_FILE ${SRC_FILES})
     message("\tFound : ${TARGET_NAME}")
     
     add_executable(${TARGET_NAME} ${SRC_FILE})
+    target_include_directories(
+        ${TARGET_NAME} PRIVATE
+        ${PROJECT_SOURCE_DIR}/include)
     target_link_libraries(${TARGET_NAME} PRIVATE
         glfw 
         glm

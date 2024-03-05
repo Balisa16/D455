@@ -117,9 +117,7 @@ namespace EMIRO
         return found_gyro && found_accel;
     }
 
-    Device::Device() : builder(),
-                       writer(builder.newStreamWriter()),
-                       transfer_lock(ATOMIC_FLAG_INIT)
+    Device::Device() : transfer_lock(ATOMIC_FLAG_INIT)
     {
         data.t_past = std::chrono::high_resolution_clock::now();
 
@@ -232,11 +230,6 @@ namespace EMIRO
 
         pc_folder = out_folder + "/pointcloud/" + std::to_string(pc_folder_idx) + '/';
         std::cout << "Pointcloud output in " << pc_folder << '\n';
-
-        // Check folder for pointcloud
-        output_file.open(out_folder + "/resume/resume" + std::to_string(pc_folder_idx) + ".json");
-        if (!output_file.is_open())
-            throw;
     }
 
     void Device::RGB_Texture(rs2::video_frame &texture, rs2::texture_coordinate Texture_XY, Color &out_RGB)
@@ -375,20 +368,6 @@ namespace EMIRO
         char buffer[20];
         std::strftime(buffer, sizeof(buffer), "%Y/%m/%d %H:%M:%S", &timeInfo);
 
-        root["filename"] = formatted_name.c_str();
-        root["time"] = buffer;
-        root["x"] = pos.x();
-        root["y"] = pos.y();
-        root["z"] = pos.z();
-        root["qw"] = quat.w;
-        root["qx"] = quat.x;
-        root["qy"] = quat.y;
-        root["qz"] = quat.z;
-
-        if (filename_idx > 1)
-            output_file << ",\n";
-
-        writer->write(root, &output_file);
         filename_idx++;
 
         std::string pcd_path = pc_folder + formatted_name;
@@ -421,7 +400,6 @@ namespace EMIRO
         data.thread_en = false;
         while (data.status != TStatus::Exit)
             ;
-        output_file.close();
 
         // Make sure transfer data is done before ending the class
         while (transfer_lock.test_and_set(std::memory_order_acquire))

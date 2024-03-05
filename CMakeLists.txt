@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(D455Sample VERSION 1.0.0)
+project(d455 VERSION 1.0.0)
 
 if(NOT CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 14)
@@ -19,7 +19,16 @@ add_subdirectory(thirdparty/jsoncpp)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(DEPENDENCIES realsense2)
 
-include_directories(
+
+add_library(${PROJECT_NAME} STATIC
+src/writer_pcd.cc
+src/tcp_client.cc
+src/device.cc
+src/UART.cc
+src/mat.cc)
+
+target_include_directories(
+    ${PROJECT_NAME} PRIVATE
     ${PCL_INCLUDE_DIRS}
     thirdparty/glfw/include
     thirdparty/glm/glm
@@ -27,21 +36,8 @@ include_directories(
     thirdparty/jsoncpp/include
     ${PROJECT_SOURCE_DIR}/include)
 
-add_library(${PROJECT_NAME} STATIC
-    src/callback.cc
-    src/writer_pcd.cc
-    src/tcp_client.cc
-    src/window.cc
-    src/device.cc
-    src/shader.cc
-    src/UART.cc
-    src/mat.cc
-    src/glad.c
-    src/stb_image.cc)
-
 link_directories(
     ${PCL_LIBRARY_DIRS}
-    # thirdparty/jsoncpp/build/lib
 )
 
 add_definitions(${PCL_DEFINITIONS})
