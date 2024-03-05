@@ -6,14 +6,11 @@ int main()
 {
 	EMIRO::Device dev;
 	EMIRO::Mat mat;
-	int counter = 5;
 	rs2::points pc;
 	rs2::frame f;
 	rs2::video_frame frame(f);
 
-	pcl::PointCloud<pcl::PointXYZRGB> pcl_pc;
-
-	PointCloud pc_main, pc_temp, pc_temp2;
+	PointCloud pc_main, pc_temp;
 
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 
@@ -33,9 +30,6 @@ int main()
 
 		dev.make_pointcloud(&pc, &frame, &pc_temp);
 
-		// dev.get_orientation(&euler);
-		// mat.transform_pc(p, euler, &pc_temp, &pc_temp2);
-		// mat.transform_pc(p, quat, &pc_temp, &pc_temp2);
 		dev.store_pc(&pc_temp, &pc_main);
 
 		if (pc_main.size > 500000)
@@ -45,10 +39,6 @@ int main()
 			mat.convert_to_pcl(&pc_main, &out_pc);
 
 			PCDWriter::write("output", out_pc, p, q);
-
-			// std::string pcd_path = dev.savePCD(out_pc);
-
-			// dev.sendPCD(pcd_path);
 
 			// Remove old data
 			pc_main.clear();
@@ -69,7 +59,7 @@ int main()
 
 		PCDWriter::write("output", out_pc, p, q);
 
-		// dev.sendPCD(pcd_path);
+		pc_main.clear();
 	}
 	return 0;
 }

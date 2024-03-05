@@ -348,17 +348,6 @@ namespace EMIRO
 
     std::string Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB> &pc, Eigen::Vector3f pos, Quaternion quat, std::string file_name)
     {
-        /*int w_ratio = 848, h_ratio = 480;
-        float ratio = h_ratio / (float) w_ratio;
-        if(pc.points.size() != w_ratio*h_ratio)
-        {
-            int w_new = w_ratio * (1.f - ratio) * pc.points.size() /(float)(w_ratio * h_ratio);
-            int h_new = h_ratio * ratio * pc.points.size() /(float)(w_ratio * h_ratio);
-            std::cout << "Resize :\nw\t: " << pc.width << " -> " << w_new << "\nh\t: " << pc.height << " -> " << h_new << '\n';
-            pc.width = w_new;
-            pc.height = h_new;
-        }*/
-
         int current_size = pc.size();
         pc.width = std::ceil(current_size / (float)pc.height);
 
@@ -420,7 +409,7 @@ namespace EMIRO
         tcp_th.detach();
     }
 
-    rs2::points &Device::clean_pc(rs2::points &in_points)
+    rs2::points Device::clean_pc(rs2::points &in_points)
     {
         rs2::points out_pc;
 

@@ -103,7 +103,7 @@ namespace EMIRO
 
 		void sendPCD(std::string file_name = "pointcloud");
 
-		rs2::points &clean_pc(rs2::points &in_points);
+		rs2::points clean_pc(rs2::points &in_points);
 
 		~Device();
 	};
