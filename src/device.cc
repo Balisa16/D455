@@ -16,6 +16,7 @@ namespace EMIRO
         std::thread::id th_id = std::this_thread::get_id();
         float maks_fps = 40.0f;
         std::cout << std::fixed << std::setprecision(2);
+        rotation_estimator rot;
 
         while (data->thread_en)
         {
@@ -24,14 +25,6 @@ namespace EMIRO
 
             data->frames = data->pipe.wait_for_frames();
             data->status = TStatus::Available;
-
-            // Update gyro data
-            // auto motion = data->frames.as<rs2::motion_frame>();
-
-            /*rs2_vector gyro_data = motion.get_motion_data();
-            data->euler.roll = gyro_data.z;
-            data->euler.pitch = gyro_data.x;
-            data->euler.yaw = gyro_data.y;*/
 
             // Release the lock
             data->lock.clear(std::memory_order_release);
@@ -44,7 +37,7 @@ namespace EMIRO
             if (_fps > maks_fps)
                 _fps = maks_fps;
 
-            std::cout << "\033[1mFPS : [";
+            std::cout << "\033[2K\r\033[1mFPS : [";
 
             // Bar color
             if ((_fps / (float)maks_fps) < 0.3f)
@@ -60,15 +53,16 @@ namespace EMIRO
             for (float j = _fps + .001f; j <= maks_fps; j += _div)
                 std::cout << " ";
 
-            std::cout << ' ' << _fps << '/' << maks_fps << "\033[0m]     \r";
+            std::cout << ' ' << _fps << '/' << maks_fps << "\033[0m]";
             std::cout.flush();
         }
-        std::cout << "Thread Finished" << std::string(45, ' ') << '\n';
+        std::cout << "\033[2K\rThread Finished" << std::string(45, ' ') << '\n';
         data->status = TStatus::Exit;
     }
 
     void Device::progress_bar(int i, int maks)
     {
+        std::cout << "\033[2K\r";
         if ((i / (float)maks) < 0.3f)
             std::cout << "\033[31m";
         else if ((i / (float)maks) > 0.7f)
@@ -84,7 +78,7 @@ namespace EMIRO
 
         std::cout << "\033[0m] " << (int)(i * 100 / maks);
         if (i < maks)
-            std::cout << "%  \r";
+            std::cout << "%";
         else
             std::cout << "% \033[32m[OK]\033[0m\n";
         std::cout.flush();
@@ -121,17 +115,13 @@ namespace EMIRO
     {
         data.t_past = std::chrono::high_resolution_clock::now();
 
-        check_dir();
-
         if (!check_imu())
             throw std::runtime_error("\033[31mIMU is not Support\033[0m");
 
         data.cfg.enable_stream(RS2_STREAM_DEPTH, 0, 848, 480, RS2_FORMAT_Z16, 30);
+        data.cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
 
         // data.cfg.enable_stream(RS2_STREAM_POSE, RS2_FORMAT_6DOF);
-        // data.cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
-
-        // data.cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
 
         data.cfg.enable_stream(RS2_STREAM_COLOR);
         // cfg.enable_stream(RS2_STREAM_INFRARED);
@@ -182,54 +172,12 @@ namespace EMIRO
         data.point = data.pc.calculate(depth);
         p = data.point;
         c = data.color;
+        std::cout << std::fixed << std::setprecision(2);
 
         /*euler->roll = data.euler.roll;
         euler->pitch = data.euler.pitch;
         euler->yaw = data.euler.yaw;*/
         data.lock.clear(std::memory_order_release);
-    }
-
-    void Device::check_dir(std::string folder)
-    {
-        out_folder = folder;
-        std::vector<std::string> f;
-        f.push_back(out_folder);
-        f.push_back(out_folder + "/pointcloud");
-        f.push_back(out_folder + "/resume");
-
-        for (int i = 0; i < f.size(); ++i)
-        {
-            if (!boost::filesystem::exists(f[i]))
-                if (!boost::filesystem::create_directory(f[i]))
-                {
-                    std::cout << "Failed create " << f[i] << '\n';
-                    throw;
-                }
-        }
-
-        // Check poitcloud folder
-        int pc_folder_idx = 0;
-        while (true)
-        {
-            bool en = false, empty = true;
-            for (const boost::filesystem::directory_entry &entry : boost::filesystem::directory_iterator(out_folder + "/pointcloud"))
-            {
-                empty = false;
-                if (boost::filesystem::is_directory(entry.path()) && std::atoi(entry.path().filename().string().c_str()) == pc_folder_idx)
-                {
-                    en = true;
-                    break;
-                }
-            }
-            if (!en || empty)
-                break;
-            pc_folder_idx++;
-        }
-
-        boost::filesystem::create_directory(out_folder + "/pointcloud/" + std::to_string(pc_folder_idx));
-
-        pc_folder = out_folder + "/pointcloud/" + std::to_string(pc_folder_idx) + '/';
-        std::cout << "Pointcloud output in " << pc_folder << '\n';
     }
 
     void Device::RGB_Texture(rs2::video_frame &texture, rs2::texture_coordinate Texture_XY, Color &out_RGB)
@@ -324,61 +272,24 @@ namespace EMIRO
 
     void Device::get_orientation(Euler *euler)
     {
-        auto motion = data.frames.as<rs2::motion_frame>();
+        while (data.lock.test_and_set(std::memory_order_acquire))
+            ;
 
-        if (motion && motion.get_profile().stream_type() == RS2_STREAM_GYRO &&
-            motion.get_profile().format() == RS2_FORMAT_MOTION_XYZ32F)
+        rs2::pose_frame pose_frame = data.frames.get_pose_frame();
+
+        if (pose_frame)
         {
-            rs2_vector gyro_data = motion.get_motion_data();
+            std::cout << "Orientation: ";
+            // rs2_vector gyro_data = motion.get_motion_data();
 
-            euler->roll = gyro_data.z;
-            euler->pitch = gyro_data.x;
-            euler->yaw = gyro_data.y;
+            // euler->roll = gyro_data.z;
+            // euler->pitch = gyro_data.x;
+            // euler->yaw = gyro_data.y;
         }
         else
             std::cout << "Failed update orientation\n";
-    }
 
-    std::string Device::savePCD(pcl::PointCloud<pcl::PointXYZRGB> &pc, Eigen::Vector3f pos, Quaternion quat, std::string file_name)
-    {
-        int current_size = pc.size();
-        pc.width = std::ceil(current_size / (float)pc.height);
-
-        // Fill blank data
-        int est_data = pc.height * pc.width;
-        int need_data = est_data - current_size;
-        pc.points.resize(est_data);
-        for (int i = 0; i < need_data; i++)
-        {
-            int pos = current_size + i;
-            pc.points[pos] = pc.points[pos - pc.height];
-        }
-
-        // Set sample position and sample quaternion
-        pc.sensor_origin_ = {pos.x(), pos.y(), pos.z(), 1.0f};
-        pc.sensor_orientation_ = {quat.w, quat.x, quat.y, quat.z};
-
-        std::string formatted_name = file_name + std::to_string(filename_idx) + ".pcd";
-
-        // Get current time
-        auto currentTime = std::chrono::system_clock::now();
-        std::time_t time = std::chrono::system_clock::to_time_t(currentTime);
-        std::tm timeInfo;
-        localtime_r(&time, &timeInfo);
-        char buffer[20];
-        std::strftime(buffer, sizeof(buffer), "%Y/%m/%d %H:%M:%S", &timeInfo);
-
-        filename_idx++;
-
-        std::string pcd_path = pc_folder + formatted_name;
-        int ret = pcl::io::savePCDFile(pcd_path.c_str(), pc);
-
-        if (ret == 0)
-            std::cout << "\033[32mSaved " << formatted_name << "\033[0m";
-        else
-            std::cout << "\033[31mPCD Export FAILED\033[0m. Status : " << ret << '\n';
-        std::cout << std::string(30, ' ') << '\n';
-        return pcd_path;
+        data.lock.clear(std::memory_order_release);
     }
 
     void Device::sendPCD(std::string file_path)
