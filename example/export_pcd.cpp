@@ -1,9 +1,14 @@
 #include <mat.hpp>
 #include <device.hpp>
 #include <writer_pcd.hpp>
+#include <tcpserver.hpp>
+#include <types.hpp>
 
 int main()
 {
+	TCPServer server;
+	Odometry odometry;
+
 	EMIRO::Device dev;
 	EMIRO::Mat mat;
 	rs2::points pc;
@@ -19,8 +24,10 @@ int main()
 	PCDWriter::set_folder("pc");
 	while (cnt)
 	{
-		Eigen::Vector3f p = {0.0f, 5.0f, 0.0f};
-		Eigen::Quaternionf q = {0.707f, 0.707f, 0.0f, 0.0f};
+		odometry = server.get_odometry();
+		std::cout << odometry << std::endl;
+		Eigen::Vector3f p = {odometry.position.x, odometry.position.y, odometry.position.z};
+		Eigen::Quaternionf q = {odometry.orientation.w, odometry.orientation.x, odometry.orientation.y, odometry.orientation.z};
 		Euler euler = {0.0f, cnt * 90.0f, 0.0f};
 		Quaternion quat;
 
