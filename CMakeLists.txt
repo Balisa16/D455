@@ -23,6 +23,7 @@ set(DEPENDENCIES realsense2)
 add_library(${PROJECT_NAME} STATIC
 src/writer_pcd.cc
 src/tcp_client.cc
+src/tcpserver.cc
 src/device.cc
 src/UART.cc
 src/mat.cc)
