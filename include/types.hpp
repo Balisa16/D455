@@ -22,18 +22,18 @@ struct Quaternion
     {
         os << "w: " << quaternion.w << " x: " << quaternion.x << " y: " << quaternion.y << " z: " << quaternion.z;
         return os;
-    };
+    }
 };
 
 struct Odometry
 {
     Position position;
     Quaternion orientation;
-    Odometry() : position({0.0f, 0.0f, 0.0f}), orientation({0.0f, 0.0f, 0.0f, 0.0f}){};
+    Odometry() : position(0.0f, 0.0f, 0.0f), orientation(0.0f, 0.0f, 0.0f, 0.0f) {}
     Odometry(Position position, Quaternion orientation) : position(position), orientation(orientation) {}
     friend std::ostream &operator<<(std::ostream &os, const Odometry &odometry)
     {
-        os << "Position: " << odometry.position << "\nOrientation: " << odometry.orientation;
+        os << "Position: " << odometry.position.x << " " << odometry.position.y << " " << odometry.position.z << "\nOrientation: " << odometry.orientation.w << " " << odometry.orientation.x << " " << odometry.orientation.y << " " << odometry.orientation.z;
         return os;
     }
 };
