@@ -1,5 +1,5 @@
 #include <cmath>
-#include <eigen3/Eigen>
+#include <eigen3/Eigen/Eigen>
 #include <pcl/pcl_exports.h>
 #include <pcl/point_types.h>
 #include <pcl/impl/point_types.hpp>
