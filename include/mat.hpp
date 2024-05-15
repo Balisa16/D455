@@ -10,7 +10,7 @@
 #include <pcl-1.8/pcl/point_types.h>
 #include <pcl-1.8/pcl/impl/point_types.hpp>
 #include <pcl-1.8/pcl/io/pcd_io.h>
-#include <pcl-1.8/pcl/common/transforms.
+#include <pcl-1.8/pcl/common/transforms.h>
 
 #include <iomanip>
 #include <types.hpp>
