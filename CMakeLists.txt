@@ -29,10 +29,13 @@ src/device.cc
 src/UART.cc
 src/mat.cc)
 
+message("PCL_LIBRARIES: ${EIGEN3_INCLUDE_DIRS}")
+
 target_include_directories(
     ${PROJECT_NAME} PRIVATE
     ${PCL_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIRS}
+    /usr/include/eigen3
     thirdparty/glfw/include
     thirdparty/glm/glm
     thirdparty/librealsense/include
