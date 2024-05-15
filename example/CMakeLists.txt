@@ -13,6 +13,9 @@ foreach(SRC_FILE ${SRC_FILES})
         glfw 
         glm
         jsoncpp
+        /usr/include/eigen3
+        /usr/include/pcl-1.8
+        /usr/include/pcl-1.8/pcl
         ${PROJECT_NAME}
         ${PCL_LIBRARIES}
         realsense2)
