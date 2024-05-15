@@ -8,14 +8,14 @@ foreach(SRC_FILE ${SRC_FILES})
     add_executable(${TARGET_NAME} ${SRC_FILE})
     target_include_directories(
         ${TARGET_NAME} PRIVATE
+        /usr/include/eigen3
+        /usr/include/pcl-1.8
+        /usr/include/pcl-1.8/pcl
         ${PROJECT_SOURCE_DIR}/include)
     target_link_libraries(${TARGET_NAME} PRIVATE
         glfw 
         glm
         jsoncpp
-        /usr/include/eigen3
-        /usr/include/pcl-1.8
-        /usr/include/pcl-1.8/pcl
         ${PROJECT_NAME}
         ${PCL_LIBRARIES}
         realsense2)

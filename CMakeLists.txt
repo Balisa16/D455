@@ -31,7 +31,7 @@ src/mat.cc)
 
 target_include_directories(
     ${PROJECT_NAME} PRIVATE
-    ${PCL_INCLUDE_DIRS}
+    # ${PCL_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIRS}
     /usr/include/eigen3
     /usr/include/pcl-1.8
