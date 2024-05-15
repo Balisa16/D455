@@ -29,8 +29,6 @@ src/device.cc
 src/UART.cc
 src/mat.cc)
 
-message("PCL_LIBRARIES: ${EIGEN3_INCLUDE_DIRS}")
-
 target_include_directories(
     ${PROJECT_NAME} PRIVATE
     ${PCL_INCLUDE_DIRS}
