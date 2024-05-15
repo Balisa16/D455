@@ -34,6 +34,7 @@ target_include_directories(
     ${PCL_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIRS}
     /usr/include/eigen3
+    /usr/include/pcl-1.10/pcl
     thirdparty/glfw/include
     thirdparty/glm/glm
     thirdparty/librealsense/include
