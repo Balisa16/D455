@@ -174,9 +174,6 @@ namespace EMIRO
         c = data.color;
         std::cout << std::fixed << std::setprecision(2);
 
-        /*euler->roll = data.euler.roll;
-        euler->pitch = data.euler.pitch;
-        euler->yaw = data.euler.yaw;*/
         data.lock.clear(std::memory_order_release);
     }
 
