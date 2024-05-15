@@ -160,7 +160,7 @@ namespace EMIRO
         tcp_cl->connection("127.0.0.1", 8888);
     }
 
-    void Device::get_pc(rs2::points &p, rs2::video_frame &c, Euler *euler)
+    void Device::get_pc(rs2::points &p, rs2::video_frame &c)
     {
         while (data.lock.test_and_set(std::memory_order_acquire))
             ;

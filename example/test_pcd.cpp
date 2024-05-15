@@ -29,10 +29,10 @@ int main()
 				  << odometry << std::endl;
 		Eigen::Vector3f p = {odometry.position.x, odometry.position.y, odometry.position.z};
 		Eigen::Quaternionf q = {odometry.orientation.w, odometry.orientation.x, odometry.orientation.y, odometry.orientation.z};
-		Euler euler = {0.0f, cnt * 90.0f, 0.0f};
+		// Euler euler = {0.0f, cnt * 90.0f, 0.0f};
 		Quaternion quat;
 
-		dev.get_pc(pc, frame, &euler);
+		dev.get_pc(pc, frame);
 
 		pc_temp.clear();
 
