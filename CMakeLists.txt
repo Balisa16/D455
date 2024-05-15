@@ -8,6 +8,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 find_package(PCL REQUIRED)
+find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system filesystem)
 
 add_subdirectory(thirdparty/glfw)
@@ -31,6 +32,7 @@ src/mat.cc)
 target_include_directories(
     ${PROJECT_NAME} PRIVATE
     ${PCL_INCLUDE_DIRS}
+    ${EIGEN3_INCLUDE_DIRS}
     thirdparty/glfw/include
     thirdparty/glm/glm
     thirdparty/librealsense/include
@@ -47,6 +49,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     pthread
     jsoncpp
+    Eigen3::Eigen
     Boost::system 
     Boost::filesystem)
 
