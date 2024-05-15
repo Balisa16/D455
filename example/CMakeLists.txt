@@ -10,7 +10,6 @@ foreach(SRC_FILE ${SRC_FILES})
         ${TARGET_NAME} PRIVATE
         /usr/include/eigen3
         /usr/include/pcl-1.8
-        /usr/include/pcl-1.8/pcl
         ${PROJECT_SOURCE_DIR}/include)
     target_link_libraries(${TARGET_NAME} PRIVATE
         glfw 

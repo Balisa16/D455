@@ -21,7 +21,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(DEPENDENCIES realsense2)
 
 
-add_library(${PROJECT_NAME} STATIC
+add_library(${PROJECT_NAME} SHARED
 src/writer_pcd.cc
 src/tcp_client.cc
 src/tcpserver.cc
@@ -29,14 +29,13 @@ src/device.cc
 src/UART.cc
 src/mat.cc)
 
+message("Found PCL: ${PCL_INCLUDE_DIRS}")
+
 target_include_directories(
     ${PROJECT_NAME} PRIVATE
-    # ${PCL_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIRS}
     /usr/include/eigen3
     /usr/include/pcl-1.8
-    /usr/include/pcl-1.8/pcl
-    # /usr/include/pcl-1.10/pcl
     thirdparty/glfw/include
     thirdparty/glm/glm
     thirdparty/librealsense/include
