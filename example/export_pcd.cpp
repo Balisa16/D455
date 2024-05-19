@@ -21,10 +21,9 @@ int main()
 	{
 		Eigen::Vector3f p = {.0f, .0f, .0f};
 		Eigen::Quaternionf q = {.0f, .0f, .0f, .0f};
-		Euler euler = {0.0f, cnt * 90.0f, 0.0f};
 		Quaternion quat;
 
-		dev.get_pc(pc, frame, &euler);
+		dev.get_pc(pc, frame);
 
 		pc_temp.clear();
 

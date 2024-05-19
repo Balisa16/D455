@@ -160,7 +160,7 @@ namespace EMIRO
         tcp_cl->connection("127.0.0.1", 8888);
     }
 
-    void Device::get_pc(rs2::points &p, rs2::video_frame &c, Euler *euler)
+    void Device::get_pc(rs2::points &p, rs2::video_frame &c)
     {
         while (data.lock.test_and_set(std::memory_order_acquire))
             ;
@@ -174,9 +174,6 @@ namespace EMIRO
         c = data.color;
         std::cout << std::fixed << std::setprecision(2);
 
-        /*euler->roll = data.euler.roll;
-        euler->pitch = data.euler.pitch;
-        euler->yaw = data.euler.yaw;*/
         data.lock.clear(std::memory_order_release);
     }
 

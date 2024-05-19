@@ -8,6 +8,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 find_package(PCL REQUIRED)
+find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system filesystem)
 
 add_subdirectory(thirdparty/glfw)
@@ -20,7 +21,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(DEPENDENCIES realsense2)
 
 
-add_library(${PROJECT_NAME} STATIC
+add_library(${PROJECT_NAME} SHARED
 src/writer_pcd.cc
 src/tcp_client.cc
 src/tcpserver.cc
@@ -28,9 +29,13 @@ src/device.cc
 src/UART.cc
 src/mat.cc)
 
+message("Found PCL: ${PCL_INCLUDE_DIRS}")
+
 target_include_directories(
     ${PROJECT_NAME} PRIVATE
-    ${PCL_INCLUDE_DIRS}
+    ${EIGEN3_INCLUDE_DIRS}
+    /usr/include/eigen3
+    /usr/include/pcl-1.8
     thirdparty/glfw/include
     thirdparty/glm/glm
     thirdparty/librealsense/include
@@ -47,6 +52,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     pthread
     jsoncpp
+    Eigen3::Eigen
     Boost::system 
     Boost::filesystem)
 
