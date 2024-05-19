@@ -1,3 +1,4 @@
+git submodule update --init
 cp -rf assets/cmake_temp/cmake1.txt thirdparty/librealsense/examples/CMakeLists.txt
 cp -rf assets/cmake_temp/cmake2.txt thirdparty/librealsense/src/gl/CMakeLists.txt
 cp -rf assets/cmake_temp/cmake3.txt thirdparty/librealsense/tools/CMakeLists.txt
