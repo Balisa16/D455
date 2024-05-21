@@ -1,6 +1,6 @@
 # D455
 
-Sampling code for D455 Camera Sampling System
+Sampling code for D455 Camera Sampling System. Receive Odometry position from Autonomous Drone System and do sampling while drone in hover position.
 
 ## Requirements
 1. Ubuntu >= 18.04
