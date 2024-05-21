@@ -35,6 +35,10 @@ target_include_directories(
     ${PROJECT_NAME} PRIVATE
     ${EIGEN3_INCLUDE_DIRS}
     /usr/include/eigen3
+    # FOR Jetson Nano
+    /usr/include/pcl-1.8
+
+    # FOR Ubuntu Desktop
     /usr/include/pcl-1.8
     thirdparty/glfw/include
     thirdparty/glm/glm
