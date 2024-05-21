@@ -39,7 +39,8 @@ target_include_directories(
     /usr/include/pcl-1.8
 
     # FOR Ubuntu Desktop
-    /usr/include/pcl-1.8
+    # /usr/include/pcl-1.10
+    
     thirdparty/glfw/include
     thirdparty/glm/glm
     thirdparty/librealsense/include
