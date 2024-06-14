@@ -1,12 +1,11 @@
-# D455
+# Pointcloud Capture System
 
-Sampling code for D455 Camera Sampling System. Receive Odometry position from Autonomous Drone System and do sampling while drone in hover position.
+This project is part of my final project for my bachelor's degree, which involves creating an autonomous drone to collect massive amounts of data at a desired target point. In this project i'm using Intelrealsense Depth Camera (D455) ass pointcloud collector which will triggering from Autonomous Drone System.
 
 ## Requirements
 1. Ubuntu >= 18.04
 2. CMake >= 3.13 (development test in 3.27.9)
 <br>*This program works well in Jetson Nano-Ubuntu 18 with upgraded CMake version aarch.*
- 
 
 ## Dependencies
 ```
