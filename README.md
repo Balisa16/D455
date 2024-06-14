@@ -1,6 +1,9 @@
 # Pointcloud Capture System
 
-This project is part of my final project for my bachelor's degree, which involves creating an autonomous drone to collect massive amounts of data at a desired target point. In this project i'm using Intelrealsense Depth Camera (D455) ass pointcloud collector which will triggering from Autonomous Drone System.
+This project is part of my final project for my bachelor's degree, which involves creating an autonomous drone to collect massive amounts of data at a desired target point.
+![General System Diagram](assets/general.png)
+In this project i'm using Intelrealsense Depth Camera (D455) ass pointcloud collector which will triggering from [Autonomous Drone System](https://github.com/Balisa16/UAV-System).
+![Pointcloud Capture System](assets/pointcloud-capture-system.png)
 
 ## Requirements
 1. Ubuntu >= 18.04
